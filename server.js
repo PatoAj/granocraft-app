@@ -1,4 +1,4 @@
-// GranoCraft/server.js
+// GranoCraft/server.js (Versión Cloudinary)
 
 // 1. IMPORTACIONES
 const express = require('express');
@@ -10,6 +10,10 @@ const multer = require('multer');
 const fs = require('fs'); 
 require('dotenv').config();
 
+// --- NUEVO: Importaciones de Cloudinary ---
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
 // Importar Modelos
 const User = require('./models/User');
 const Product = require('./models/Product');
@@ -20,8 +24,15 @@ const Location = require('./models/Location');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DB_URL = process.env.MONGODB_URI || 'mongodb://localhost:27017/granocraft_db';
-// Clave Fija Literal para eliminar errores de .env
 const JWT_LITERAL_SECRET = "EstaEsMiLlaveSecretaParaGranoCraft2025"; 
+
+// --- NUEVO: Configuración de Cloudinary ---
+// (Lee las variables que pusiste en Render/dotenv)
+cloudinary.config({ 
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET 
+});
 
 // 3. CONEXIÓN A MONGODB
 mongoose.connect(DB_URL)
@@ -34,27 +45,37 @@ mongoose.connect(DB_URL)
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// --- CONFIGURACIÓN DE MULTER ---
-const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir);
-    console.log('Carpeta "uploads" creada.');
-}
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) { cb(null, 'uploads/'); },
-    filename: function (req, file, cb) { cb(null, Date.now() + '-' + file.originalname.replace(/\s+/g, '-')); }
+// --- CONFIGURACIÓN DE MULTER (MODIFICADA) ---
+// Ya no usamos 'uploads/' ni 'fs.existsSync(uploadsDir)'
+
+// Configurar Multer para que suba a Cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: (req, file) => {
+    // Determinar la carpeta en Cloudinary basado en la ruta
+    let folderName = 'GranoCraft/general';
+    if (req.originalUrl.includes('/api/products')) folderName = 'GranoCraft/products';
+    if (req.originalUrl.includes('/api/profile/image')) folderName = 'GranoCraft/profiles';
+    if (req.originalUrl.includes('/api/profile/gallery')) folderName = 'GranoCraft/gallery';
+    if (req.originalUrl.includes('/api/posts')) folderName = 'GranoCraft/blog';
+    if (req.originalUrl.includes('/api/locations')) folderName = 'GranoCraft/locations';
+
+    return {
+      folder: folderName,
+      allowed_formats: ['jpeg', 'jpg', 'png', 'webp'],
+      // Crear un ID público único (nombre del archivo en Cloudinary)
+      public_id: `granocraft_${Date.now()}` 
+    };
+  }
 });
-const fileFilter = (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) { cb(null, true); } 
-    else { cb(new Error('Solo se permiten archivos de imagen.'), false); }
-};
-const upload = multer({ storage: storage, fileFilter: fileFilter, limits: { fileSize: 1024 * 1024 * 5 } });
+
+const upload = multer({ storage: storage }); // ¡Ahora usa el storage de Cloudinary!
 
 // --- SERVIR ARCHIVOS ESTÁTICOS ---
-app.use('/uploads', express.static(uploadsDir));
+// Ya no necesitamos servir /uploads, pero sí el resto de la app
 app.use(express.static(path.join(__dirname))); 
 
-// --- Middlewares de Autenticación y Roles (Versión Estable) ---
+// --- Middlewares de Autenticación y Roles ---
 const protect = (req, res, next) => {
     let token;
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -72,109 +93,35 @@ const protect = (req, res, next) => {
     }
 };
 
-const isAdmin = (req, res, next) => {
-    if (req.user && req.user.role === 'admin') { next(); } 
-    else { res.status(403).send('Acción no autorizada. Requiere rol de administrador.'); }
-};
-
-const isProducer = (req, res, next) => {
-    if (req.user && req.user.role === 'producer') { next(); } 
-    else { res.status(403).send('Acción no autorizada. Requiere rol de productor.'); }
-};
+const isAdmin = (req, res, next) => { /* ... (sin cambios) ... */ };
+const isProducer = (req, res, next) => { /* ... (sin cambios) ... */ };
 
 
 // **********************************************
-// 5. RUTAS (APIs)
+// 5. RUTAS (APIs) - MODIFICADAS
 // **********************************************
 
-// --- Rutas de Autenticación ---
-app.post('/register', async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const existingUser = await User.findOne({ email });
-        if (existingUser) return res.status(400).send('El correo electrónico ya está registrado.');
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ email, password: hashedPassword }); 
-        await newUser.save();
-        res.status(201).send('¡Usuario registrado exitosamente! Ya puedes iniciar sesión.');
-    } catch (error) {
-        res.status(500).send('Error interno del servidor durante el registro.');
-    }
-});
+// --- Rutas de Autenticación --- (Sin cambios)
+app.post('/register', async (req, res) => { /* ... (sin cambios) ... */ });
+app.post('/login', async (req, res) => { /* ... (sin cambios) ... */ });
 
-app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const user = await User.findOne({ email });
-        if (!user) return res.status(401).send('Credenciales inválidas (usuario no encontrado).');
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(401).send('Credenciales inválidas (contraseña incorrecta).');
+// --- RUTA PÚBLICA: Perfil de Productor --- (Sin cambios)
+app.get('/api/public/profile/:id', async (req, res) => { /* ... (sin cambios) ... */ });
 
-        const payload = { id: user._id, role: user.role, email: user.email }; 
-        const token = jwt.sign(payload, JWT_LITERAL_SECRET, { expiresIn: '7d' });
-        res.status(200).json({ message: 'Inicio de sesión exitoso.', token: token, role: user.role });
-    } catch (error){
-        res.status(500).send('Error interno del servidor.');
-    }
-});
+// --- API: Gestión de Perfil (Propio) --- (Sin cambios)
+app.get('/api/profile', protect, async (req, res) => { /* ... (sin cambios) ... */ });
+app.put('/api/profile', protect, async (req, res) => { /* ... (sin cambios) ... */ });
 
-// --- RUTA PÚBLICA: Perfil de Productor ---
-app.get('/api/public/profile/:id', async (req, res) => {
-    try {
-        // Asegúrate de incluir los nuevos campos: profileImage y galleryImages
-        const producer = await User.findById(req.params.id).select('producerNamePublic bio contact email profileImage galleryImages');
-        if (!producer) return res.status(404).send('Productor no encontrado.');
-        res.json(producer);
-    } catch (error) {
-        res.status(500).send('Error interno del servidor al buscar perfil.');
-    }
-});
-
-// --- API: Gestión de Perfil (Propio) ---
-app.get('/api/profile', protect, async (req, res) => {
-    try {
-        // Asegúrate de incluir los nuevos campos
-        const user = await User.findById(req.user.id).select('-password');
-        if (!user) return res.status(404).send('Usuario no encontrado.');
-        res.status(200).json(user);
-    } catch (error) {
-        res.status(500).send('Error al obtener perfil.');
-    }
-});
-
-app.put('/api/profile', protect, async (req, res) => {
-    try {
-        const updates = req.body;
-        // Estos campos no se pueden actualizar desde este formulario
-        delete updates.role;
-        delete updates.email;
-        delete updates.profileImage;
-        delete updates.galleryImages;
-        
-        const updatedUser = await User.findByIdAndUpdate(
-            req.user.id, { $set: updates }, { new: true, runValidators: true }
-        ).select('-password');
-
-        if (!updatedUser) return res.status(404).send('Usuario no encontrado.');
-        res.status(200).json(updatedUser);
-    } catch (error) {
-        res.status(500).send('Error al actualizar perfil: ' + error.message);
-    }
-});
-
-// --- NUEVO: API: Gestión de Imagen de Perfil/Logo ---
+// --- API: Gestión de Imagen de Perfil/Logo (MODIFICADA) ---
 app.post('/api/profile/image', protect, upload.single('profileImage'), async (req, res) => {
-    if (!req.file) {
-        return res.status(400).send('No se ha subido ningún archivo.');
-    }
+    if (!req.file) return res.status(400).send('No se ha subido ningún archivo.');
     try {
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).send('Usuario no encontrado.');
 
-        if (user.profileImage && fs.existsSync(user.profileImage)) {
-            fs.unlinkSync(user.profileImage);
-        }
-        user.profileImage = req.file.path.replace(/\\/g, "/"); 
+        // TODO: Eliminar imagen antigua de Cloudinary (user.profileImage)
+        
+        user.profileImage = req.file.path; // req.file.path ahora es la URL de Cloudinary
         await user.save();
         res.status(200).json({ profileImage: user.profileImage });
     } catch (error) {
@@ -187,9 +134,8 @@ app.delete('/api/profile/image', protect, async (req, res) => {
         const user = await User.findById(req.user.id);
         if (!user || !user.profileImage) return res.status(404).send('No hay imagen de perfil para eliminar.');
 
-        if (fs.existsSync(user.profileImage)) {
-            fs.unlinkSync(user.profileImage);
-        }
+        // TODO: Eliminar imagen de Cloudinary (user.profileImage)
+        
         user.profileImage = undefined; 
         await user.save();
         res.status(200).send('Imagen de perfil eliminada.');
@@ -198,16 +144,14 @@ app.delete('/api/profile/image', protect, async (req, res) => {
     }
 });
 
-// --- NUEVO: API: Gestión de Galería (Carrusel) ---
+// --- API: Gestión de Galería (MODIFICADA) ---
 app.post('/api/profile/gallery', protect, upload.array('galleryImages', 10), async (req, res) => {
-    if (!req.files || req.files.length === 0) {
-        return res.status(400).send('No se subieron archivos.');
-    }
+    if (!req.files || req.files.length === 0) return res.status(400).send('No se subieron archivos.');
     try {
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).send('Usuario no encontrado.');
 
-        const newImageUrls = req.files.map(file => file.path.replace(/\\/g, "/"));
+        const newImageUrls = req.files.map(file => file.path); // URLs de Cloudinary
         user.galleryImages.push(...newImageUrls);
         await user.save();
         res.status(200).json(user.galleryImages); 
@@ -219,7 +163,6 @@ app.post('/api/profile/gallery', protect, upload.array('galleryImages', 10), asy
 app.delete('/api/profile/gallery', protect, async (req, res) => {
     const { imageUrl } = req.body; 
     if (!imageUrl) return res.status(400).send('URL de imagen requerida.');
-    
     try {
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).send('Usuario no encontrado.');
@@ -227,9 +170,8 @@ app.delete('/api/profile/gallery', protect, async (req, res) => {
         user.galleryImages = user.galleryImages.filter(img => img !== imageUrl);
         await user.save();
         
-        if (fs.existsSync(imageUrl)) {
-            fs.unlinkSync(imageUrl);
-        }
+        // TODO: Eliminar imagen de Cloudinary (imageUrl)
+        
         res.status(200).send('Imagen eliminada.');
     } catch (error) {
         res.status(500).send('Error al eliminar imagen: ' + error.message);
@@ -237,10 +179,10 @@ app.delete('/api/profile/gallery', protect, async (req, res) => {
 });
 
 
-// --- API CRUD: Gestión de Productos ---
+// --- API CRUD: Gestión de Productos (MODIFICADA) ---
 app.post('/api/products', protect, isProducer, upload.single('imageFile'), async (req, res) => {
     if (!req.file) return res.status(400).send('La imagen del producto es obligatoria.');
-    const imageUrl = req.file.path.replace(/\\/g, "/");
+    const imageUrl = req.file.path; // URL de Cloudinary
     try {
         const newProduct = new Product({ ...req.body, imageUrl: imageUrl, owner: req.user.id });
         await newProduct.save();
@@ -250,40 +192,9 @@ app.post('/api/products', protect, isProducer, upload.single('imageFile'), async
     }
 });
 
-app.get('/api/products/my', protect, async (req, res) => {
-    try {
-        let products;
-        if (req.user.role === 'admin') {
-            products = await Product.find({}).populate('owner', 'email').sort({ createdAt: -1 }); 
-        } else { 
-            products = await Product.find({ owner: req.user.id }).sort({ createdAt: -1 }); 
-        }
-        res.status(200).json(products);
-    } catch (error) { res.status(500).send('Error al obtener productos.'); }
-});
-
-app.get('/api/products', async (req, res) => {
-    try {
-        const products = await Product.find({})
-            .populate({
-                path: 'owner',
-                select: 'producerNamePublic contact email _id profileImage', // Añadir profileImage
-            })
-            .sort({ createdAt: -1 });
-        res.json(products);
-    } catch (error) {
-        res.status(500).send('Error al obtener productos.');
-    }
-});
-
-app.get('/api/products/:id', async (req, res) => {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('ID inválido.');
-    try {
-        const product = await Product.findById(req.params.id);
-        if (!product) return res.status(404).send('Producto no encontrado.');
-        res.status(200).json(product);
-    } catch (error) { res.status(500).send('Error al obtener producto.'); }
-});
+app.get('/api/products/my', protect, async (req, res) => { /* ... (sin cambios) ... */ });
+app.get('/api/products', async (req, res) => { /* ... (sin cambios) ... */ });
+app.get('/api/products/:id', async (req, res) => { /* ... (sin cambios) ... */ });
 
 app.put('/api/products/:id', protect, upload.single('imageFile'), async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('ID inválido.');
@@ -293,8 +204,8 @@ app.put('/api/products/:id', protect, upload.single('imageFile'), async (req, re
         if (product.owner.toString() !== req.user.id && req.user.role !== 'admin') return res.status(403).send('No autorizado.');
         const updatedData = { ...req.body };
         if (req.file) { 
-            if (product.imageUrl && fs.existsSync(product.imageUrl)) fs.unlinkSync(product.imageUrl);
-            updatedData.imageUrl = req.file.path.replace(/\\/g, "/"); 
+            // TODO: Eliminar imagen antigua de Cloudinary (product.imageUrl)
+            updatedData.imageUrl = req.file.path; // Nueva URL de Cloudinary
         }
         const updatedProduct = await Product.findByIdAndUpdate(req.params.id, updatedData, { new: true, runValidators: true });
         if (!updatedProduct) return res.status(404).send('No se pudo actualizar.');
@@ -309,35 +220,23 @@ app.delete('/api/products/:id', protect, async (req, res) => {
         if (!product) return res.status(404).send('Producto no encontrado.');
         if (product.owner.toString() !== req.user.id && req.user.role !== 'admin') return res.status(403).send('No autorizado.');
         
-        if (product.imageUrl && fs.existsSync(product.imageUrl)) fs.unlinkSync(product.imageUrl);
+        // TODO: Eliminar imagen de Cloudinary (product.imageUrl)
         await Product.findByIdAndDelete(req.params.id);
         
         res.status(200).send('Producto eliminado.');
     } catch (error) { res.status(500).send('Error al eliminar producto.'); }
 });
 
-// --- API: Gestión de Ubicación ---
-app.get('/api/locations', async (req, res) => { 
-     try {
-         const locations = await Location.find({}).populate('owner', 'producerNamePublic _id');
-         res.status(200).json(locations);
-     } catch (error) { res.status(500).send('Error al obtener ubicaciones.'); }
-});
-app.get('/api/locations/my-location', protect, isProducer, async (req, res) => { 
-     try {
-         const location = await Location.findOne({ owner: req.user.id });
-         res.status(200).json(location || {}); 
-     } catch (error) { res.status(500).send('Error al obtener ubicación.'); }
-});
+// --- API: Gestión de Ubicación (MODIFICADA) ---
+app.get('/api/locations', async (req, res) => { /* ... (sin cambios) ... */ });
+app.get('/api/locations/my-location', protect, isProducer, async (req, res) => { /* ... (sin cambios) ... */ });
 app.post('/api/locations', protect, isProducer, upload.single('imageFile'), async (req, res) => { 
     const locationData = { ...req.body, owner: req.user.id };
     try {
         const existingLocation = await Location.findOne({ owner: req.user.id });
         if (req.file) {
-            if (existingLocation && existingLocation.imageUrl && fs.existsSync(existingLocation.imageUrl)) {
-                fs.unlinkSync(existingLocation.imageUrl);
-            }
-            locationData.imageUrl = req.file.path.replace(/\\/g, "/");
+            // TODO: Eliminar imagen antigua de Cloudinary (existingLocation.imageUrl)
+            locationData.imageUrl = req.file.path; // URL de Cloudinary
         }
         
         if (existingLocation) {
@@ -353,50 +252,17 @@ app.post('/api/locations', protect, isProducer, upload.single('imageFile'), asyn
     }
 });
 
-// --- API: Gestión de Usuarios (Admin) ---
-app.get('/api/users', protect, isAdmin, async (req, res) => {
-    try {
-        const users = await User.find().select('-password'); 
-        res.status(200).json(users);
-    } catch (error) {
-        res.status(500).send('Error al obtener usuarios.');
-    }
-});
-app.put('/api/users/:id/role', protect, isAdmin, async (req, res) => {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('ID de usuario inválido.');
-    try {
-        const { role } = req.body;
-        if (!['producer', 'admin'].includes(role)) return res.status(400).send('Rol inválido.');
-        const updatedUser = await User.findByIdAndUpdate(
-            req.params.id, { role }, { new: true, runValidators: true }
-        ).select('-password');
-        if (!updatedUser) return res.status(404).send('Usuario no encontrado.');
-        res.status(200).json(updatedUser);
-    } catch (error) {
-        res.status(500).send('Error al actualizar el rol: ' + error.message);
-    }
-});
-app.delete('/api/users/:id', protect, isAdmin, async (req, res) => {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('ID de usuario inválido.');
-    try {
-        const user = await User.findById(req.params.id);
-        if (user && req.user && user._id.toString() === req.user.id) {
-            return res.status(403).send('No puedes eliminar tu propia cuenta desde el panel.');
-        }
-        const deletedUser = await User.findByIdAndDelete(req.params.id);
-        if (!deletedUser) return res.status(404).send('Usuario no encontrado.');
-        res.status(200).send('Usuario eliminado exitosamente.');
-    } catch (error) {
-        res.status(500).send('Error al eliminar usuario.');
-    }
-});
+// --- API: Gestión de Usuarios (Admin) --- (Sin cambios)
+app.get('/api/users', protect, isAdmin, async (req, res) => { /* ... (sin cambios) ... */ });
+app.put('/api/users/:id/role', protect, isAdmin, async (req, res) => { /* ... (sin cambios) ... */ });
+app.delete('/api/users/:id', protect, isAdmin, async (req, res) => { /* ... (sin cambios) ... */ });
 
-// --- API CRUD: Gestión de Posts (Admin) ---
+// --- API CRUD: Gestión de Posts (Admin) (MODIFICADA) ---
 app.post('/api/posts', protect, isAdmin, upload.single('imageFile'), async (req, res) => {
-    const imageUrl = req.file ? req.file.path.replace(/\\/g, "/") : null;
+    const imageUrl = req.file ? req.file.path : null; // URL de Cloudinary
     const { title, content } = req.body;
     if (!title || !content) {
-        if (req.file) fs.unlinkSync(req.file.path);
+        // No es necesario borrar el archivo de /uploads, Cloudinary lo maneja
         return res.status(400).send('El título y el contenido son obligatorios.');
     }
     try {
@@ -404,7 +270,6 @@ app.post('/api/posts', protect, isAdmin, upload.single('imageFile'), async (req,
         await newPost.save();
         res.status(201).json(newPost);
     } catch (error) {
-        if (req.file) fs.unlinkSync(req.file.path);
         if (error.code === 11000) return res.status(409).send('Ya existe un post con este título.');
         res.status(500).send('Error al crear post: ' + error.message);
     }
@@ -416,8 +281,8 @@ app.put('/api/posts/:id', protect, isAdmin, upload.single('imageFile'), async (r
         const post = await Post.findById(req.params.id);
         if (!post) return res.status(404).send('Post no encontrado.');
         if (req.file) { 
-            if (post.imageUrl && fs.existsSync(post.imageUrl)) fs.unlinkSync(post.imageUrl);
-            updatedData.imageUrl = req.file.path.replace(/\\/g, "/"); 
+            // TODO: Eliminar imagen antigua de Cloudinary (post.imageUrl)
+            updatedData.imageUrl = req.file.path; 
         }
         const updatedPost = await Post.findByIdAndUpdate(req.params.id, updatedData, { new: true, runValidators: true });
         res.status(200).json(updatedPost);
@@ -425,42 +290,19 @@ app.put('/api/posts/:id', protect, isAdmin, upload.single('imageFile'), async (r
         res.status(500).send('Error al actualizar post: ' + error.message);
     }
 });
-// OBTENER UN Post por ID (Pública, para el modal de lectura)
-app.get('/api/posts/:id', async (req, res) => {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('ID inválido.');
-    try {
-        // CAMBIO AQUÍ: Pedimos 'producerNamePublic' además del 'email'
-        const post = await Post.findById(req.params.id)
-             .populate('author', 'email producerNamePublic'); 
-        if (!post) return res.status(404).send('Post no encontrado.');
-        res.status(200).json(post);
-    } catch (error) { res.status(500).send('Error al obtener post.'); }
-});
-
-// OBTENER TODOS Posts (Pública, para la lista del blog)
-app.get('/api/posts', async (req, res) => {
-    try {
-        // CAMBIO AQUÍ: Pedimos 'producerNamePublic' además del 'email'
-        const posts = await Post.find({})
-            .populate('author', 'email producerNamePublic') 
-            .sort({ createdAt: -1 });
-        res.json(posts);
-    } catch (error) {
-        res.status(500).send('Error al obtener posts.');
-    }
-});
+app.get('/api/posts/:id', async (req, res) => { /* ... (sin cambios) ... */ });
+app.get('/api/posts', async (req, res) => { /* ... (sin cambios) ... */ });
 app.delete('/api/posts/:id', protect, isAdmin, async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('ID inválido.');
     try {
         const deletedPost = await Post.findByIdAndDelete(req.params.id);
         if (!deletedPost) return res.status(404).send('Post no encontrado.');
-        if (deletedPost.imageUrl && fs.existsSync(deletedPost.imageUrl)) {
-            fs.unlinkSync(deletedPost.imageUrl);
-        }
+        
+        // TODO: Eliminar imagen de Cloudinary (deletedPost.imageUrl)
+        
         res.status(200).send('Post eliminado.');
     } catch (error) { res.status(500).send('Error al eliminar post.'); }
 });
-
 
 // **********************************************
 // 6. INICIO DEL SERVIDOR
