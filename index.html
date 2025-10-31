@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GranoCraft - Inicio</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <style>
+        .hero-button {
+            display: inline-block;
+            background-color: #ffffff; 
+            color: #3C2A21; 
+            border: 2px solid #3C2A21; 
+            padding: 12px 28px;
+            border-radius: 50px; 
+            font-size: 1.1em;
+            font-weight: 600;
+            text-decoration: none;
+            margin-top: 25px;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .hero-button i {
+            margin-right: 8px;
+        }
+        .hero-button:hover {
+            background-color: #3C2A21;
+            color: #ffffff;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">☕ GranoCraft</div>
+        <nav id="main-nav">
+            <a href="index.html" class="active"><i class="fa-solid fa-house"></i> Inicio</a>
+            <a href="productos.html"><i class="fa-solid fa-mug-saucer"></i> Productos</a>
+            <a href="mapa.html"><i class="fa-solid fa-map-location-dot"></i> Mapa</a>
+            <a href="blog.html"><i class="fa-solid fa-newspaper"></i> Blog</a>
+            
+            <span id="session-links"> 
+                <a href="login.html"><i class="fa-solid fa-right-to-bracket"></i> Login</a> 
+            </span>
+            <span id="admin-links" style="display: none;">
+                <a href="admin.html"><i class="fa-solid fa-gauge"></i> Panel</a>
+                <button id="logout-button-nav"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+            </span>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Bienvenido a GranoCraft</h1>
+        <p>El lugar donde el café artesanal cobra vida en Guatemala.</p>
+        
+        <a href="mapa.html" class="hero-button">
+            <i class="fa-solid fa-map-location-dot"></i> Explorar el Mapa
+        </a>
+    </section>
+
+    <section class="about">
+        <div style="background: #FAF6F0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); padding: 40px; max-width: 800px; margin: 0 auto; text-align: center;">
+            <h2>¿Quiénes somos?</h2>
+            <p style="font-size: 1.1em; line-height: 1.6; margin: 0;">
+                Una plataforma para conectar a productores de café artesanal con amantes del buen café en Guatemala y el mundo. Apoyamos la sostenibilidad y la calidad del grano guatemalteco.
+            </p>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2025 GranoCraft - ® HiuPat. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GranoCraft - Productos</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo">☕ GranoCraft</div>
+        <nav>
+            <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
+            <a href="productos.html"><i class="fa-solid fa-mug-saucer"></i> Productos</a>
+            <a href="mapa.html"><i class="fa-solid fa-map-location-dot"></i> Mapa</a>
+            <a href="blog.html"><i class="fa-solid fa-newspaper"></i> Blog</a>
+            
+            <span id="session-links"> 
+                <a href="login.html"><i class="fa-solid fa-right-to-bracket"></i> Login</a> 
+            </span>
+            <span id="admin-links" style="display: none;">
+                <a href="admin.html"><i class="fa-solid fa-gauge"></i> Panel</a>
+                <button id="logout-button-nav"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+            </span>
+        </nav>
+    </header>
+
+    <section class="productos">
+        <h1>Nuestros Productos</h1>
+        
+        <div class="grid" id="products-grid">
+            <p>Cargando productos...</p>
+        </div>
+        </section>
+
+    <footer>
+        <p>© 2025 GranoCraft - ® HiuPat. Todos los derechos reservados.</p>
+    </footer>
+
+<script src="js/main.js"></script>
+<script src="js/products.js"></script>
+    
+</body>
+</html>

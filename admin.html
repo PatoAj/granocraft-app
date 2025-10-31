@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GranoCraft - Panel de Usuario</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        /* Estilos en línea para asegurar que Tailwind y CSS base funcionen */
+        .content-area { background-color: #ffffff; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 1.5rem; }
+        .sidebar-link { display: block; padding: 0.75rem 1rem; margin-bottom: 0.5rem; border-radius: 0.375rem; color: #3C2A21; transition: background-color 0.2s ease; cursor: pointer; }
+        .sidebar-link:hover { background-color: #f3f4f6; }
+        .sidebar-link.active { background-color: #A18A76; color: white; font-weight: 600; }
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+        #locationMap { height: 300px; width: 100%; border-radius: 0.375rem; border: 1px solid #d1d5db; margin-bottom: 1rem; }
+        .modal { display: none; /* Oculto por defecto */ }
+        .modal.active { display: flex; align-items: flex-start; justify-content: center; padding-top: 5vh; } /* Alineado arriba para scroll */
+        .modal-content-wrapper { max-height: 90vh; overflow-y: auto; }
+        #imagePreview, #editImagePreview, #locationImagePreview, #blogImagePreview, #editPostImagePreview { max-height: 100px; margin-top: 5px; border-radius: 4px; border: 1px solid #ccc; display: none; object-fit: cover; }
+        .table-actions button { margin-right: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.875rem; border-radius: 0.25rem; border: none; cursor: pointer; }
+        .delete-btn { background-color: #e53e3e; color: white; } .delete-btn:hover { background-color: #c53030; }
+        .edit-btn { background-color: #a0aec0; color: white; } .edit-btn:hover { background-color: #718096; }
+        .form-input { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        .form-input:focus { outline: 2px solid transparent; outline-offset: 2px; border-color: #A18A76; box-shadow: 0 0 0 3px rgba(161, 138, 118, 0.3); }
+        .form-label { display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem; }
+        .form-button { flex: 1 1 0%; padding: 0.5rem 1rem; border-radius: 0.375rem; transition: background-color 0.15s ease-in-out; border: none; }
+        .form-button-primary { background-color: #3C2A21; color: white; }
+        .form-button-primary:hover { background-color: #2D1F17; }
+        .form-button-secondary { background-color: #d1d5db; color: #374151; }
+        .form-button-secondary:hover { background-color: #9ca3af; }
+        .file-input-button input[type="file"]::file-selector-button { margin-right: 1rem; padding: 0.5rem 1rem; border-radius: 0.375rem; border-width: 0; font-size: 0.875rem; font-weight: 600; background-color: #A18A76; color: white; cursor: pointer; transition: background-color 0.15s ease-in-out; }
+         .file-input-button input[type="file"]::file-selector-button:hover { background-color: #8B7763; }
+         .file-input-button input[type="file"] { color: #6b7280; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen bg-[#E8D9C5]">
+    
+    <div id="toast-container" class="toast-container"></div>
+
+    <header class="bg-[#3C2A21] text-white p-4 flex justify-between items-center shadow-md">
+        <a href="index.html" class="logo font-bold text-lg text-white no-underline">☕ GranoCraft - Panel</a>
+        <nav>
+            <a href="index.html" class="hover:underline mx-2"><i class="fa-solid fa-house fa-fw mr-1"></i>Inicio</a>
+            <button id="logoutButton" class="bg-transparent border-none text-white cursor-pointer text-base ml-2 hover:underline"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+        </nav>
+    </header>
+
+    <div class="flex flex-grow">
+        <aside class="w-64 bg-white p-4 shadow-lg min-h-full flex flex-col">
+             <h2 class="text-xl font-semibold mb-4 text-[#3C2A21]">Menú</h2>
+             <nav id="admin-sidebar-nav" class="flex-grow">
+                 <a href="#" class="sidebar-link active" data-section="profileSection" id="profileLink"><i class="fa-solid fa-user-gear fa-fw mr-2"></i>Mi Perfil</a>
+                 <a href="#" class="sidebar-link" data-section="productsSection" id="productsLink" style="display: none;"><i class="fa-solid fa-boxes-stacked fa-fw mr-2"></i>Mis Productos</a>
+                 <a href="#" class="sidebar-link" data-section="locationSection" id="locationLink" style="display: none;"><i class="fa-solid fa-location-dot fa-fw mr-2"></i>Mi Ubicación</a>
+                 <a href="#" class="sidebar-link" data-section="manageBlogSection" id="manageBlogLink" style="display: none;"><i class="fa-solid fa-pen-to-square fa-fw mr-2"></i>Gestionar Blog</a>
+                 <a href="#" class="sidebar-link" data-section="manageUsersSection" id="manageUsersLink" style="display: none;"><i class="fa-solid fa-users fa-fw mr-2"></i>Gestionar Usuarios</a>
+             </nav>
+             <div class="mt-auto text-sm text-gray-500">
+                 Rol: <span id="userRoleDisplay">Cargando...</span>
+             </div>
+        </aside>
+
+        <main class="flex-1 p-6 overflow-y-auto">
+            <div id="profileSection" class="admin-section active content-area">
+                 <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Mi Perfil y Contacto Público</h2>
+                 <form id="profileForm" class="max-w-4xl mx-auto">
+                     <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Información Pública</h3>
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                         <div>
+                             <label for="producerNamePublic" class="form-label">Nombre Público (Finca/Café):</label>
+                             <input type="text" id="producerNamePublic" name="producerNamePublic" class="form-input" required>
+                         </div>
+                         <div>
+                             <label for="emailDisplay" class="form-label">Correo de Cuenta (No editable):</label>
+                             <input type="email" id="emailDisplay" disabled class="form-input bg-gray-100 cursor-not-allowed">
+                         </div>
+                     </div>
+                     <div class="mt-4">
+                         <label for="bio" class="form-label">Acerca de Mí/Nosotros (Bio Pública):</label>
+                         <textarea id="bio" name="bio" rows="3" class="form-input"></textarea>
+                     </div>
+                     <h3 class="text-xl font-medium my-4 text-[#3C2A21]">Opciones de Contacto</h3>
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                         <div>
+                             <label for="whatsapp" class="form-label">WhatsApp (Número + Código País):</label>
+                             <input type="text" id="whatsapp" name="contact.whatsapp" class="form-input">
+                         </div>
+                         <div>
+                             <label for="instagram" class="form-label">Instagram (@usuario):</label>
+                             <input type="text" id="instagram" name="contact.instagram" class="form-input">
+                         </div>
+                         <div>
+                             <label for="facebook" class="form-label">Facebook (URL o nombre):</label>
+                             <input type="text" id="facebook" name="contact.facebook" class="form-input">
+                         </div>
+                          <div class="flex items-center mt-6">
+                             <input type="checkbox" id="showEmail" name="contact.showEmail" class="h-4 w-4 text-[#8a5a44] border-gray-300 rounded focus:ring-[#8a5a44]">
+                             <label for="showEmail" class="ml-2 form-label mb-0">Mostrar mi Email de contacto públicamente</label>
+                         </div>
+                     </div>
+                     <div class="flex justify-end mt-6">
+                         <button type="submit" class="form-button form-button-primary px-6">Guardar Perfil</button>
+                     </div>
+                 </form>
+
+                 <hr class="my-8 border-gray-300">
+                 <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Logo o Foto de Perfil</h3>
+                 <form id="profileImageForm" class="max-w-4xl mx-auto">
+                     <div class="mt-4">
+                         <label for="profileImageFile" class="form-label">Subir Logo o Foto (se reemplazará la anterior):</label>
+                         <input type="file" id="profileImageFile" name="profileImage" accept="image/*" class="w-full text-sm text-gray-500 file-input-button">
+                         
+                         <div class="mt-4 relative w-36 h-36">
+                             <img id="currentProfileImage" src="#" alt="Logo actual" class="rounded-full border border-gray-300 shadow-sm" style="width: 150px; height: 150px; object-fit: cover; display: none;">
+                             <button type="button" id="deleteProfileImageBtn" class="absolute top-0 right-0 px-2 py-1 bg-red-600 text-white text-xs rounded-full hover:bg-red-700" style="display: none; font-size: 10px; line-height: 1;">
+                                 <i class="fa-solid fa-trash"></i>
+                             </button>
+                         </div>
+                     </div>
+                     <div class="flex justify-end mt-4">
+                         <button type="submit" class="form-button form-button-primary px-6">Guardar Logo</button>
+                     </div>
+                 </form>
+                 <hr class="my-8 border-gray-300">
+                 <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Galería de Imágenes (Carrusel)</h3>
+                 <form id="galleryUploadForm" class="max-w-4xl mx-auto">
+                     <div class="mt-4">
+                         <label for="galleryImageFiles" class="form-label">Añadir nuevas imágenes (máx. 10 a la vez):</label>
+                         <input type="file" id="galleryImageFiles" name="galleryImages" accept="image/*" multiple 
+                                class="w-full text-sm text-gray-500 file-input-button">
+                     </div>
+                     <div class="flex justify-end mt-4">
+                         <button type="submit" class="form-button form-button-primary px-6">Añadir Imágenes a Galería</button>
+                     </div>
+                 </form>
+
+                 <h4 class="text-lg font-medium mt-6 mb-2 text-[#3C2A21]">Galería Actual:</h4>
+                 <div id="currentGallery" class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                     <p>Cargando galería...</p>
+                 </div>
+                 </div>
+
+            <div id="productsSection" class="admin-section content-area">
+                 <div class="flex justify-between items-center mb-4">
+                     <h2 class="text-2xl font-semibold text-[#3C2A21]" id="productsSectionTitle">Mis Productos</h2>
+                     <button id="showAddProductFormBtn" class="px-4 py-2 bg-[#3C2A21] text-white rounded-md hover:bg-opacity-80" style="display: none;">Añadir Producto +</button>
+                 </div>
+                 <div id="addProductFormContainer" class="mb-6 p-6 border rounded-lg bg-gray-50 max-w-4xl mx-auto" style="display: none;">
+                    <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Nuevo Producto</h3>
+                    <form id="addProductForm">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label for="name" class="form-label">Nombre:</label><input type="text" id="name" name="name" required class="form-input"></div>
+                            <div><label for="price" class="form-label">Precio (Q):</label><input type="number" id="price" name="price" step="0.01" required class="form-input"></div>
+                            <div><label for="origin" class="form-label">Origen:</label><input type="text" id="origin" name="origin" required class="form-input"></div>
+                            <div><label for="producerName" class="form-label">Nombre Productor (Opcional):</label><input type="text" id="producerName" name="producerName" class="form-input"></div>
+                            <div><label for="roastLevel" class="form-label">Tueste:</label><select id="roastLevel" name="roastLevel" class="form-input"><option value="Claro">Claro</option><option value="Medio" selected>Medio</option><option value="Oscuro">Oscuro</option></select></div>
+                            <div><label for="stock" class="form-label">Stock:</label><input type="number" id="stock" name="stock" value="0" class="form-input"></div>
+                        </div>
+                        <div class="mt-4"><label for="description" class="form-label">Descripción:</label><textarea id="description" name="description" rows="4" required class="form-input"></textarea></div>
+                        <div class="mt-4">
+                            <label for="imageFile" class="form-label">Cargar Imagen:</label>
+                            <input type="file" id="imageFile" name="imageFile" accept="image/*" required class="w-full text-sm text-gray-500 file-input-button">
+                            <img id="imagePreview" src="#" alt="Vista previa" class="mt-2"/>
+                        </div>
+                        <div class="flex gap-4 mt-6">
+                            <button type="submit" class="form-button form-button-primary">Guardar</button>
+                            <button type="button" id="cancelAddProductBtn" class="form-button form-button-secondary">Cancelar</button>
+                        </div>
+                    </form>
+                 </div>
+                 <div class="overflow-x-auto">
+                     <table class="w-full text-sm text-left text-gray-500">
+                         <thead class="text-xs text-[#3C2A21] uppercase bg-gray-100">
+                             <tr>
+                                 <th class="px-6 py-3">Nombre</th> <th class="px-6 py-3">Precio</th> <th class="px-6 py-3">Origen</th>
+                                 <th class="px-6 py-3">Productor</th> <th class="px-6 py-3">Stock</th> <th class="px-6 py-3">Acciones</th>
+                             </tr>
+                         </thead>
+                         <tbody id="products-tbody">
+                             <tr><td colspan="6" class="px-6 py-4 text-center">Cargando...</td></tr>
+                         </tbody>
+                     </table>
+                 </div>
+            </div>
+
+            <div id="locationSection" class="admin-section content-area">
+                <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Mi Ubicación en el Mapa</h2>
+                <p class="mb-4 text-gray-600">Actualiza los datos de tu finca o cafetería. Haz clic en el mapa para establecer tu ubicación.</p>
+                <form id="locationForm" class="max-w-4xl mx-auto">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="locationName" class="form-label">Nombre de la Finca/Café:</label>
+                            <input type="text" id="locationName" name="locationName" required class="form-input">
+                        </div>
+                        <div>
+                            <label for="address" class="form-label">Dirección:</label>
+                            <input type="text" id="address" name="address" required class="form-input">
+                        </div>
+                    </div>
+                    <label class="form-label">Ubicación en el Mapa:</label>
+                    <div id="locationMap"></div>
+                    <p class="text-xs text-gray-500 mt-1 mb-4">Haz clic en el mapa para colocar el marcador.</p>
+                    <input type="hidden" id="locationLatitude" name="latitude">
+                    <input type="hidden" id="locationLongitude" name="longitude">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="schedule" class="form-label">Horario (Opcional):</label>
+                            <input type="text" id="schedule" name="schedule" class="form-input" placeholder="Ej: L-S: 8am - 6pm">
+                        </div>
+                        <div>
+                            <label for="specialty" class="form-label">Especialidad (Opcional):</label>
+                            <input type="text" id="specialty" name="specialty" class="form-input" placeholder="Ej: V60, Chemex">
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label for="locationImageFile" class="form-label">Cargar Imagen (Opcional):</label>
+                        <input type="file" id="locationImageFile" name="imageFile" accept="image/*" class="w-full text-sm text-gray-500 file-input-button">
+                        <img id="locationImagePreview" src="#" alt="Vista previa de ubicación" class="mt-2"/>
+                    </div>
+                    <div class="flex justify-end mt-6">
+                        <button type="submit" class="form-button form-button-primary px-6">Guardar Ubicación</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="manageBlogSection" class="admin-section content-area">
+                 <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Gestionar Blog</h2>
+                 <form id="addPostForm" class="mb-8 p-6 border rounded-lg bg-gray-50 max-w-4xl mx-auto">
+                      <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Crear Entrada</h3>
+                      <div class="mb-4">
+                          <label for="postTitle" class="form-label">Título:</label>
+                          <input type="text" id="postTitle" name="title" required class="form-input">
+                      </div>
+                      <div class="mb-4">
+                          <label for="postContent" class="form-label">Contenido:</label>
+                          <textarea id="postContent" name="content" rows="8" required class="form-input"></textarea>
+                      </div>
+                      <div class="mt-4">
+                            <label for="addPostImageFile" class="form-label">Cargar Imagen (Opcional):</label>
+                            <input type="file" id="addPostImageFile" name="imageFile" accept="image/*" class="w-full text-sm text-gray-500 file-input-button">
+                            <img id="blogImagePreview" src="#" alt="Vista previa" class="mt-2"/>
+                      </div>
+                      <button type="submit" class="w-full form-button form-button-primary mt-6">Publicar</button>
+                 </form>
+                 <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Entradas Publicadas</h3>
+                 <div class="overflow-x-auto">
+                     <table class="w-full text-sm text-left text-gray-500">
+                         <thead class="text-xs text-[#3C2A21] uppercase bg-gray-100">
+                             <tr>
+                                 <th class="px-6 py-3">Título</th>
+                                 <th class="px-6 py-3">Fecha</th>
+                                 <th class="px-6 py-3">Acciones</th>
+                             </tr>
+                         </thead>
+                         <tbody id="posts-tbody">
+                             <tr><td colspan="3" class="px-6 py-4 text-center">Cargando...</td></tr>
+                         </tbody>
+                     </table>
+                 </div>
+            </div>
+
+             <div id="manageUsersSection" class="admin-section content-area">
+                <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Gestionar Usuarios</h2>
+                 <div class="overflow-x-auto">
+                     <table class="w-full text-sm text-left text-gray-500">
+                         <thead class="text-xs text-[#3C2A21] uppercase bg-gray-100">
+                             <tr>
+                                 <th class="px-6 py-3">Email</th>
+                                 <th class="px-6 py-3">Rol</th>
+                                 <th class="px-6 py-3">Acciones</th>
+                             </tr>
+                         </thead>
+                         <tbody id="users-tbody">
+                             <tr><td colspan="3" class="px-6 py-4 text-center">Cargando...</td></tr>
+                         </tbody>
+                     </table>
+                 </div>
+            </div>
+
+            <div id="editProductModal" class="modal fixed inset-0 z-50 overflow-y-auto hidden items-center justify-center p-4">
+                <div class="fixed inset-0 bg-gray-500 opacity-75 transition-opacity" aria-hidden="true"></div>
+                <div class="modal-content-wrapper relative bg-white rounded-lg text-left overflow-hidden shadow-xl max-w-4xl w-full m-4 transform transition-all">
+                     <div class="bg-white px-6 pt-5 pb-4 sm:p-6 sm:pb-4">
+                         <div class="flex justify-between items-center mb-4">
+                             <h3 class="text-lg font-medium text-gray-900">Editar Producto</h3>
+                             <button id="closeModalBtn" type="button" class="text-gray-400 hover:text-gray-500 text-2xl">&times;</button>
+                         </div>
+                         <form id="editProductForm">
+                             <input type="hidden" id="editProductId" name="id">
+                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                 <div><label for="editName" class="form-label">Nombre:</label><input type="text" id="editName" name="name" required class="form-input"></div>
+                                 <div><label for="editPrice" class="form-label">Precio:</label><input type="number" id="editPrice" name="price" step="0.01" required class="form-input"></div>
+                                 <div><label for="editOrigin" class="form-label">Origen:</label><input type="text" id="editOrigin" name="origin" required class="form-input"></div>
+                                 <div><label for="editProducerName" class="form-label">Productor:</label><input type="text" id="editProducerName" name="producerName" class="form-input"></div>
+                                 <div><label for="editRoastLevel" class="form-label">Tueste:</label><select id="editRoastLevel" name="roastLevel" class="form-input"><option value="Claro">Claro</option><option value="Medio">Medio</option><option value-="Oscuro">Oscuro</option></select></div>
+                                 <div><label for="editStock" class="form-label">Stock:</label><input type="number" id="editStock" name="stock" class="form-input"></div>
+                             </div>
+                             <div class="mt-4"><label for="editDescription" class="form-label">Descripción:</label><textarea id="editDescription" name="description" rows="4" required class="form-input"></textarea></div>
+                             <div class="mt-4">
+                                 <label for="editImageFile" class="form-label">Cambiar Imagen:</label>
+                                 <input type="file" id="editImageFile" name="imageFile" accept="image/*" class="w-full text-sm text-gray-500 file-input-button">
+                                 <img id="editImagePreview" src="#" alt="Vista previa" class="mt-2"/>
+                             </div>
+                         </form>
+                     </div>
+                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                         <button type="submit" form="editProductForm" class="w-full sm:w-auto inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium form-button form-button-primary">Actualizar</button>
+                         <button type="button" id="cancelEditBtn" class="mt-3 w-full sm:mt-0 sm:ml-3 sm:w-auto inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50">Cancelar</button>
+                     </div>
+                </div>
+            </div>
+            
+            <div id="editPostModal" class="modal fixed inset-0 z-50 overflow-y-auto hidden items-center justify-center p-4">
+                <div class="fixed inset-0 bg-gray-500 opacity-75 transition-opacity" aria-hidden="true"></div>
+                <div class="modal-content-wrapper relative bg-white rounded-lg text-left overflow-hidden shadow-xl max-w-4xl w-full m-4 transform transition-all">
+                     <div class="bg-white px-6 pt-5 pb-4 sm:p-6 sm:pb-4">
+                         <div class="flex justify-between items-center mb-4">
+                             <h3 class="text-lg font-medium text-gray-900">Editar Entrada de Blog</h3>
+                             <button id="closePostModalBtn" type="button" class="text-gray-400 hover:text-gray-500 text-2xl">&times;</button>
+                         </div>
+                         <form id="editPostForm">
+                             <input type="hidden" id="editPostId" name="id">
+                             <div class="mb-4">
+                                 <label for="editPostTitle" class="form-label">Título:</label>
+                                 <input type="text" id="editPostTitle" name="title" required class="form-input">
+                             </div>
+                             <div class="mt-4"><label for="editPostContent" class="form-label">Contenido:</label><textarea id="editPostContent" name="content" rows="8" required class="form-input"></textarea></div>
+                             <div class="mt-4">
+                                 <label for="editPostImageFile" class="form-label">Cambiar Imagen:</label>
+                                 <input type="file" id="editPostImageFile" name="imageFile" accept="image/*" class="w-full text-sm text-gray-500 file-input-button">
+                                 <img id="editPostImagePreview" src="#" alt="Vista previa" class="mt-2"/>
+                             </div>
+                         </form>
+                     </div>
+                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                         <button type="submit" form="editPostForm" class="w-full sm:w-auto inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium form-button form-button-primary">Actualizar Post</button>
+                         <button type="button" id="cancelPostEditBtn" class="mt-3 w-full sm:mt-0 sm:ml-3 sm:w-auto inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50">Cancelar</button>
+                     </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <footer class="bg-[#3C2A21] text-white text-center p-4 mt-auto">
+        <p>© 2025 GranoCraft - ® HiuPat. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

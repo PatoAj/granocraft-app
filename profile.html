@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="profile-title">Perfil del Productor | GranoCraft</title>
+    
+    <link rel="stylesheet" href="css/style.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplelightbox/2.14.2/simple-lightbox.min.css">
+
+    <style>
+        /* Estilos específicos para la tarjeta de perfil */
+        .profile-card {
+            max-width: 800px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            padding-top: 80px; /* Espacio para el logo superpuesto */
+            text-align: center;
+            position: relative; /* Para el logo */
+        }
+        .profile-card h1 {
+            color: #3C2A21;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .profile-card p.bio {
+            color: #555;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        /* ESTILOS DE BOTONES DE CONTACTO */
+        .contact-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 5px 10px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            color: white; /* Color de texto blanco */
+        }
+        .contact-links a i {
+            margin-right: 8px; /* Espacio entre icono y texto */
+        }
+        .whatsapp { background-color: #25D366; }
+        .whatsapp:hover { background-color: #128C7E; }
+        .instagram { background-color: #C13584; }
+        .instagram:hover { background-color: #833AB4; }
+        .facebook { background-color: #1877F2; }
+        .facebook:hover { background-color: #0E5CBE; }
+        .email-link { background-color: #3C2A21; }
+        .email-link:hover { background-color: #2D1F17; }
+        
+        /* Estilos para la galería con Lightbox */
+        .gallery-container {
+            margin-top: 30px;
+            margin-bottom: 40px;
+            text-align: center; /* Centrar el título de galería */
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* 2 a 4 columnas responsivas */
+            gap: 15px;
+            max-width: 700px; /* Ancho máximo para el grid */
+            margin: 20px auto; /* Centrar el grid */
+        }
+        .gallery-item {
+            width: 100%;
+            padding-bottom: 100%; /* Proporción cuadrada para los thumbnails */
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+        .gallery-item:hover {
+            transform: translateY(-5px);
+        }
+        .gallery-item img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Recortar si es necesario para llenar el cuadrado */
+            border-radius: 8px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Más pequeñas en móvil */
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#F5F0E8]">
+    <div id="toast-container" class="toast-container"></div>
+
+    <header>
+        <div class="logo">☕ GranoCraft</div>
+        <nav>
+            <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
+            <a href="productos.html"><i class="fa-solid fa-mug-saucer"></i> Productos</a>
+            <a href="mapa.html"><i class="fa-solid fa-map-location-dot"></i> Mapa</a>
+            <a href="blog.html"><i class="fa-solid fa-newspaper"></i> Blog</a>
+            <span id="session-links"><a href="login.html" id="login-link"><i class="fa-solid fa-right-to-bracket"></i> Login</a></span>
+             <span id="admin-links" style="display: none;">
+                <a href="admin.html" id="admin-link"><i class="fa-solid fa-gauge"></i> Panel</a>
+                <button id="logout-button-nav"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+            </span>
+        </nav>
+    </header>
+
+    <section class="profile-card" id="profile-container">
+        
+        <img id="producer-logo" src="#" alt="Logo del Productor" 
+             class="mx-auto rounded-full border-4 border-white shadow-lg" 
+             style="width: 150px; height: 150px; object-fit: cover; display: none; 
+                    position: absolute; top: -75px; left: 50%; transform: translateX(-50%);">
+
+        <h1 id="producer-name" class="pt-12">Cargando Perfil...</h1>
+        <p class="bio" id="producer-bio"></p>
+        
+        <div class="gallery-container" id="profile-gallery-container" style="display: none;">
+            <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Galería de Imágenes</h2>
+            <div class="gallery-grid" id="gallery-grid">
+                </div>
+        </div>
+        
+        <h2 style="font-size: 1.5rem; margin-top: 40px; margin-bottom: 20px; color: #3C2A21;">Contacto</h2>
+        <div id="contact-links" class="contact-links flex justify-center flex-wrap gap-4">
+            </div>
+        
+    </section>
+
+    <footer>
+        <p>© 2025 GranoCraft - ® HiuPat. Todos los derechos reservados.</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplelightbox/2.14.2/simple-lightbox.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/producer_profile.js"></script>
+</body>
+</html>

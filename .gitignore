@@ -1,0 +1,12 @@
+# Dependencias de Node.js (se reinstalan en el servidor)
+node_modules/
+
+# Archivo de variables de entorno (¡MUY IMPORTANTE!)
+.env
+
+# Imágenes subidas por el usuario (no deben estar en el código fuente)
+uploads/
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db

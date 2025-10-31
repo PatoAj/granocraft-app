@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GranoCraft - Iniciar Sesión</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="toast-container" class="toast-container"></div>
+    <header>
+        <div class="logo">☕ GranoCraft</div>
+        <nav>
+            <a href="index.html"><i class="fa-solid fa-house"></i> Inicio</a>
+            <a href="productos.html"><i class="fa-solid fa-mug-saucer"></i> Productos</a>
+            <a href="mapa.html"><i class="fa-solid fa-map-location-dot"></i> Mapa</a>
+            <a href="blog.html"><i class="fa-solid fa-newspaper"></i> Blog</a>
+            
+            <span id="session-links"> 
+                <a href="login.html"><i class="fa-solid fa-right-to-bracket"></i> Login</a> 
+            </span>
+            <span id="admin-links" style="display: none;">
+                <a href="admin.html"><i class="fa-solid fa-gauge"></i> Panel</a>
+                <button id="logout-button-nav"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+            </span>
+        </nav>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    </header>
+
+    <!-- Nuevo Contenedor Centrado -->
+    <div class="auth-container">
+        
+        <!-- Nueva Tarjeta de Autenticación -->
+        <div class="auth-card">
+            <div class="logo-container">☕</div>
+            <h1>Iniciar Sesión</h1>
+            <p class="subtitle">Bienvenido de vuelta a GranoCraft</p>
+
+            <form id="loginForm" action="#" method="POST"> 
+                <label for="email">Correo Electrónico:</label>
+                <input type="email" id="email" name="email" required class="form-input">
+                
+                <label for="password">Contraseña:</label>
+                <!-- Wrapper para el icono del ojo -->
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" required class="form-input">
+                    <span id="togglePassword">👁️</span>
+                </div>
+                
+                <button type="submit" class="form-button">Ingresar</button>
+            </form>
+
+            <div class="auth-links">
+                <!-- <a href="#">¿Olvidaste tu contraseña?</a> (Descomentar si se implementa) -->
+                <a href="register.html">¿No tienes cuenta? Regístrate</a>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="custom-alert" class="fixed inset-0 bg-black bg-opacity-50 justify-center items-center hidden transition-opacity duration-300">
+        <div class="bg-white p-6 rounded-lg shadow-2xl max-w-sm text-center transform transition-transform duration-300 scale-90" id="alert-content">
+            <p class="text-lg font-semibold mb-2" id="alert-message"></p>
+            </div>
+    </div>
+
+    <footer>
+        <p>© 2025 GranoCraft - ® HiuPat. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Scripts (main.js maneja el form, el ojo, y el nav) -->
+    <script src="js/main.js"></script>
+</body>
+</html>

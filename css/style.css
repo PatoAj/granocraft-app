@@ -1,0 +1,205 @@
+/* --- ESTILOS GLOBALES Y PALETA CÁLIDA --- */
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    /* Fondo beige/crema muy sutil */
+    background: linear-gradient(120deg, #F5F0E8 0%, #E8D9C5 100%);
+    color: #3C2A21; /* Marrón oscuro texto principal */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* --- HEADER Y FOOTER (Diseño Limpio) --- */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff; /* Mantenemos blanco para limpieza */
+    padding: 15px 30px;
+    color: #3C2A21;
+    border-bottom: 1px solid #eeeeee;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+header .logo { font-weight: bold; font-size: 1.3em; }
+nav a { color: #3C2A21; margin: 0 12px; text-decoration: none; font-weight: 500; }
+/* Usamos un tono canela/terracota para el hover */
+nav a:hover, #logout-button-nav:hover { color: #8a5a44; }
+nav a.active { border-bottom: 2px solid #3C2A21; padding-bottom: 3px; font-weight: bold; }
+#logout-button-nav { background: none; border: none; color: #3C2A21; cursor: pointer; font-size: 1em; font-weight: 500; margin-left: 10px; }
+
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background: #ffffff;
+    color: #555;
+    margin-top: auto;
+    border-top: 1px solid #eeeeee;
+}
+
+/* --- SECCIONES DE CONTENIDO PRINCIPAL --- */
+.hero {
+    /* ... (Estilos del hero se mantienen) ... */
+     text-align: center;
+     background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('../img/hero-guatemala.jpg');
+     background-size: cover; background-position: center; color: white;
+     text-shadow: 1px 1px 4px rgba(0,0,0,0.6); padding: 120px 20px; flex-grow: 1;
+}
+.hero h1 { font-size: 3em; margin-bottom: 10px; }
+.hero p { font-size: 1.2em; max-width: 600px; margin: 0 auto; }
+
+.about, .productos, .mapa, .galeria {
+    padding: 50px 20px;
+    flex-grow: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 90%;
+}
+.about h2, .galeria h2 { text-align: center; font-size: 2.2em; margin-bottom: 30px; color: #3C2A21; }
+.productos h1, .mapa h1 { text-align: center; font-size: 2.5em; margin-bottom: 40px; }
+
+
+/* --- GRID Y CARD (Productos/Blog/Galería - Con fondo cálido) --- */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+.card {
+    background: #FAF6F0; /* Fondo beige claro para tarjetas */
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
+.card img { width: 100%; height: 200px; object-fit: cover; }
+.card h3 { font-size: 1.3em; color: #3C2A21; margin: 15px 20px 10px 20px; }
+.card p { font-size: 0.95em; color: #555; padding: 0 20px; line-height: 1.6; flex-grow: 1; margin-bottom: 15px; }
+.card .price { font-size: 1.2em; font-weight: bold; color: #3C2A21; margin: 0 20px 15px 20px; text-align: right; }
+.card p strong { color: #8a5a44; /* Tono terracota para productor */ }
+/* Estilos específicos para tarjeta de blog */
+.card .card-content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+.card .card-content .date { font-size: 0.85em; color: #8a5a44; margin-bottom: 10px; }
+
+
+/* --- ESTILOS LOGIN Y REGISTRO (Cálidos) --- */
+.auth-container { display: flex; align-items: center; justify-content: center; padding: 40px 20px; flex-grow: 1; }
+.auth-card {
+    background: #FAF6F0; /* Fondo beige claro */
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+}
+.auth-card .logo-container { font-size: 1.8em; font-weight: bold; color: #3C2A21; margin-bottom: 15px; }
+.auth-card h1 { font-size: 2em; color: #3C2A21; margin-bottom: 10px; }
+.auth-card .subtitle { color: #666; margin-bottom: 30px; }
+.auth-card form { text-align: left; }
+.auth-card label { display: block; margin-bottom: 8px; font-weight: 600; color: #3C2A21; }
+.auth-card .form-input {
+    width: 100%; padding: 12px; border: 1px solid #D1C7B8; /* Borde beige más oscuro */
+    border-radius: 8px; box-sizing: border-box; margin-bottom: 20px;
+    background-color: #fff; /* Input blanco para contraste */
+}
+.auth-card .form-input:focus {
+    border-color: #8a5a44; /* Borde terracota al enfocar */
+    outline: none; box-shadow: 0 0 0 3px rgba(138, 90, 68, 0.3);
+}
+.auth-card .password-wrapper { position: relative; width: 100%; }
+.auth-card .password-wrapper input { width: 100%; }
+.auth-card #togglePassword { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888; }
+.auth-card .form-button {
+    width: 100%; padding: 14px; border: none; border-radius: 8px;
+    background: #8a5a44; /* Tono terracota/canela para el botón */
+    color: white; font-size: 1em; font-weight: 600; cursor: pointer; transition: background-color 0.2s ease;
+}
+.auth-card .form-button:hover {
+    background: #6B4F4B; /* Marrón más oscuro al pasar */
+}
+.auth-card .auth-links { margin-top: 25px; text-align: center; }
+.auth-card .auth-links a {
+    color: #8a5a44; /* Tono terracota para enlaces */
+    text-decoration: none; margin: 0 10px; font-weight: 500;
+}
+.auth-card .auth-links a:hover { text-decoration: underline; }
+
+/* --- Media Query Responsive (Ajustes Adicionales) --- */
+@media (max-width: 768px) {
+    header { flex-direction: column; padding: 10px; }
+    nav { margin-top: 10px; display: flex; flex-wrap: wrap; justify-content: center; }
+    nav a, #logout-button-nav { margin: 5px 8px; }
+    .hero h1 { font-size: 2.2em; }
+    .hero p { font-size: 1em; }
+    .about, .productos, .mapa, .galeria { padding: 30px 15px; }
+    .productos h1, .mapa h1, .about h2, .galeria h2 { font-size: 1.8em; margin-bottom: 25px; }
+    .auth-card { padding: 30px; } /* Menos padding en móvil */
+}
+
+/* --- ESTILOS DE NOTIFICACIÓN TOAST (Top-Left) --- */
+
+/* Contenedor principal de las notificaciones */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 9999; /* Asegura que esté por encima de todo */
+    width: 320px; /* Ancho de la notificación */
+}
+
+/* Estilo de cada notificación individual */
+.toast {
+    background-color: #ffffff;
+    color: #333;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    margin-bottom: 10px;
+    font-size: 0.95em;
+    font-weight: 500;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    opacity: 0; /* Inicia oculta */
+    /* Animación de entrada y salida */
+    animation: slideInLeft 0.4s ease forwards, slideOutLeft 0.4s ease 3s forwards;
+}
+
+/* Colores de borde para éxito y error */
+.toast-success {
+    border-left: 5px solid #4CAF50; /* Verde */
+}
+
+.toast-error {
+    border-left: 5px solid #e53e3e; /* Rojo */
+}
+
+/* Animación de entrada */
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-120%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Animación de salida (después de 3 segundos) */
+@keyframes slideOutLeft {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(-120%);
+        opacity: 0;
+        margin-top: -50px; /* Desliza hacia arriba al salir */
+    }
+}
