@@ -1,4 +1,4 @@
-// GranoCraft/js/blog.js
+// GranoCraft/js/blog.js (Versión Cloudinary)
 
 document.addEventListener('DOMContentLoaded', () => {
     const postsGrid = document.getElementById('posts-grid');
@@ -14,15 +14,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const formatDate = (d) => new Date(d).toLocaleDateString('es-GT', { year: 'numeric', month: 'long', day: 'numeric' });
 
-    // --- FUNCIÓN DE TARJETA ---
+    // --- FUNCIÓN DE IMAGEN CORREGIDA ---
+    function getImageUrl(path) {
+        if (!path) {
+            // Placeholder si no hay imagen
+            return 'https://via.placeholder.com/300x200/A18A76/FFFFFF?text=GranoCraft+Blog';
+        }
+        if (path.startsWith('http')) {
+            // Es una URL de Cloudinary, devolverla tal cual
+            return path;
+        }
+        // Es una ruta local (antigua de /uploads/), añadir /
+        return `/${path}`;
+    }
+
+    // --- FUNCIÓN DE TARJETA ACTUALIZADA ---
     function createPostCard(post) {
-        let imageUrl = post.imageUrl 
-            ? `/${post.imageUrl}` 
-            : 'https://via.placeholder.com/300x200/A18A76/FFFFFF?text=GranoCraft+Blog';
-
+        let imageUrl = getImageUrl(post.imageUrl);
         const excerpt = post.content.substring(0, 150) + (post.content.length > 150 ? '...' : '');
-
-        // Usar el nombre público del autor
         const authorName = post.author ? (post.author.producerNamePublic || post.author.email) : 'Administrador';
 
         return `
@@ -34,13 +43,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         Por ${authorName} | ${formatDate(post.createdAt)}
                     </p>
                     <p style="flex-grow: 1;">${excerpt}</p>
-                    <button class="read-more-btn" data-id="${post._id}" style="color: #8a5a44; font-weight: bold; margin-top: 15px; text-align: left; background: none; border: none; padding: 0;">Leer más →</button>
+                    <button classs="read-more-btn" data-id="${post._id}" style="color: #8a5a44; font-weight: bold; margin-top: 15px; text-align: left; background: none; border: none; padding: 0;">Leer más →</button>
                 </div>
             </div>
         `;
     }
 
-    // --- FUNCIÓN DEL MODAL ---
+    // --- FUNCIÓN DEL MODAL ACTUALIZADA ---
     async function loadFullPost(postId) {
         try {
             const response = await fetch(`/api/posts/${postId}`);
@@ -48,22 +57,20 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const post = await response.json();
             
-            const imageUrl = post.imageUrl ? `/${post.imageUrl}` : '';
-            
-            // Usar el nombre público del autor
+            const imageUrl = getImageUrl(post.imageUrl);
             const authorName = post.author ? (post.author.producerNamePublic || post.author.email) : 'Administrador';
 
             modalTitle.textContent = post.title;
             modalMeta.textContent = `Publicado el ${formatDate(post.createdAt)} por ${authorName}`;
             
-            if (imageUrl) {
+            if (post.imageUrl) {
                 modalImage.src = imageUrl;
                 modalImage.style.display = 'block';
             } else {
                 modalImage.style.display = 'none';
             }
             
-            modalBody.textContent = post.content;
+            modalBody.textContent = post.content; 
             
             fullPostModal.style.display = 'flex'; 
             document.body.style.overflow = 'hidden'; 
@@ -72,7 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('No se pudo cargar el contenido completo del post.');
         }
     }
-
 
     // --- FUNCIÓN PRINCIPAL ---
     async function fetchPosts() {
@@ -96,7 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (postId) loadFullPost(postId);
                 });
             });
-
 
         } catch (error) {
             console.error("Fallo al obtener los posts:", error);

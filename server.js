@@ -27,6 +27,7 @@ const DB_URL = process.env.MONGODB_URI || 'mongodb://localhost:27017/granocraft_
 const JWT_LITERAL_SECRET = "EstaEsMiLlaveSecretaParaGranoCraft2025"; 
 
 // --- Configuración de Cloudinary ---
+// (Lee las variables de tu .env local O de Render)
 cloudinary.config({ 
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
   api_key: process.env.CLOUDINARY_API_KEY, 
@@ -66,6 +67,7 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage: storage }); // Usa el storage de Cloudinary
 
 // --- SERVIR ARCHIVOS ESTÁTICOS ---
+// Ya no necesitamos /uploads, Multer ya no guarda localmente
 app.use(express.static(path.join(__dirname))); 
 
 // --- Middlewares de Autenticación y Roles ---
@@ -435,19 +437,19 @@ app.delete('/api/users/:id', protect, isAdmin, async (req, res) => {
 
 // --- API CRUD: Gestión de Posts (Admin) ---
 app.post('/api/posts', protect, isAdmin, upload.single('imageFile'), async (req, res) => {
-    const imageUrl = req.file ? req.file.path : null;
-    const { title, content } = req.body;
-    if (!title || !content) {
-        return res.status(400).send('El título y el contenido son obligatorios.');
-    }
-    try {
-        const newPost = new Post({ title, content, imageUrl: imageUrl, author: req.user.id });
-        await newPost.save();
-        res.status(201).json(newPost);
-    } catch (error) {
-        if (error.code === 11000) return res.status(409).send('Ya existe un post con este título.');
-        res.status(500).send('Error al crear post: ' + error.message);
-    }
+    const imageUrl = req.file ? req.file.path : null;
+    const { title, content } = req.body;
+    if (!title || !content) {
+        return res.status(400).send('El título y el contenido son obligatorios.');
+    }
+    try {
+        const newPost = new Post({ title, content, imageUrl: imageUrl, author: req.user.id });
+        await newPost.save();
+        res.status(201).json(newPost);
+    } catch (error) {
+        if (error.code === 11000) return res.status(409).send('Ya existe un post con este título.');
+        res.status(500).send('Error al crear post: ' + error.message);
+    }
 });
 app.put('/api/posts/:id', protect, isAdmin, upload.single('imageFile'), async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('ID inválido.');
@@ -466,31 +468,31 @@ app.put('/api/posts/:id', protect, isAdmin, upload.single('imageFile'), async (r
     }
 });
 app.get('/api/posts/:id', async (req, res) => {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('ID inválido.');
-    try {
-        const post = await Post.findById(req.params.id).populate('author', 'email producerNamePublic');
-    if (!post) return res.status(404).send('Post no encontrado.');
-        res.status(200).json(post);
-    } catch (error) { res.status(500).send('Error al obtener post.'); }
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('ID inválido.');
+    try {
+        const post = await Post.findById(req.params.id).populate('author', 'email producerNamePublic');
+        if (!post) return res.status(404).send('Post no encontrado.');
+        res.status(200).json(post);
+    } catch (error) { res.status(500).send('Error al obtener post.'); }
 });
 app.get('/api/posts', async (req, res) => {
-    try {
-        const posts = await Post.find({}).populate('author', 'email producerNamePublic').sort({ createdAt: -1 });
-        res.json(posts);
-    } catch (error) {
-        res.status(500).send('Error al obtener posts.');
-    }
+    try {
+        const posts = await Post.find({}).populate('author', 'email producerNamePublic').sort({ createdAt: -1 });
+        res.json(posts);
+    } catch (error) {
+        res.status(500).send('Error al obtener posts.');
+    }
 });
 app.delete('/api/posts/:id', protect, isAdmin, async (req, res) => {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('ID inválido.');
-    try {
-        const deletedPost = await Post.findByIdAndDelete(req.params.id);
-        if (!deletedPost) return res.status(4);
-        
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('ID inválido.');
+    try {
+        const deletedPost = await Post.findByIdAndDelete(req.params.id);
+        if (!deletedPost) return res.status(404).send('Post no encontrado.');
+        
         // TODO: Eliminar imagen de Cloudinary (deletedPost.imageUrl)
-        
-        res.status(200).send('Post eliminado.');
-    } catch (error) { res.status(500).send('Error al eliminar post.'); }
+        
+        res.status(200).send('Post eliminado.');
+    } catch (error) { res.status(500).send('Error al eliminar post.'); }
 });
 
 // **********************************************
