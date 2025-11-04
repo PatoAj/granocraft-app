@@ -1,10 +1,31 @@
-// js/map.js
+// js/map.js (CÓDIGO CORREGIDO PARA SOPORTAR CLOUDINARY O RUTAS LOCALES)
 
 document.addEventListener('DOMContentLoaded', () => {
     const mapElement = document.getElementById('mapaPublico');
     const locationsListContainer = document.getElementById('locationsListContainer');
     
     if (!mapElement) { return; }
+
+    // 1. FUNCIÓN CORREGIDA PARA MANEJAR RUTAS CLOUDINARY O LOCALES
+    /**
+     * Determina la URL correcta de la imagen (Cloudinary, local o placeholder).
+     * @param {string} path - La ruta o URL devuelta por el servidor (location.imageUrl).
+     * @param {number} width - Ancho del placeholder.
+     * @param {number} height - Alto del placeholder.
+     * @param {string} placeholderText - Texto para el placeholder.
+     */
+    function getImageUrl(path, width, height, placeholderText = 'Sin Imagen') {
+        if (!path) {
+            // Placeholder si no hay imagen
+            return `https://via.placeholder.com/${width}x${height}/A18A76/FFFFFF?text=${placeholderText}`;
+        }
+        if (path.startsWith('http')) {
+            // Es una URL absoluta (Cloudinary o externa), devolverla tal cual
+            return path;
+        }
+        // Es una ruta relativa (antigua /uploads/), añadir /
+        return `/${path}`;
+    }
 
     // 2. Inicializar el mapa de Leaflet
     const map = L.map('mapaPublico').setView([15.7835, -90.2308], 7);
@@ -14,10 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Función para crear el contenido del Popup (ventana emergente)
     function createPopupContent(location) {
-        const imageUrl = location.imageUrl 
-            ? `/${location.imageUrl}` 
-            : 'https://via.placeholder.com/300x150/A18A76/FFFFFF?text=Sin+Imagen';
-
+        // Usar la función corregida para la imagen del Popup (e.g., 300x150)
+        const imageUrl = getImageUrl(location.imageUrl, 300, 150); 
+        
         // Usamos el nombre del productor para mayor claridad
         const producerName = location.owner ? location.owner.producerNamePublic : 'N/A';
 
@@ -34,9 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Función para crear la tarjeta de lista (Directorio)
     function createLocationCard(location) {
-        const imageUrl = location.imageUrl 
-            ? `/${location.imageUrl}` 
-            : 'https://via.placeholder.com/150x100/A18A76/FFFFFF?text=Sin+Imagen';
+        // Usar la función corregida para la imagen de la Tarjeta (e.g., 150x100)
+        const imageUrl = getImageUrl(location.imageUrl, 150, 100); 
 
         const producerName = location.owner ? location.owner.producerNamePublic : 'N/A';
         const producerId = location.owner ? location.owner._id : '#';
@@ -72,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Centrar el mapa si hay ubicaciones
             if (locations[0] && locations[0].latitude) {
-                 map.setView([locations[0].latitude, locations[0].longitude], 10);
+                map.setView([locations[0].latitude, locations[0].longitude], 10);
             }
         }
     }
