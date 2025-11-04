@@ -33,8 +33,8 @@
         .form-button-secondary { background-color: #d1d5db; color: #374151; }
         .form-button-secondary:hover { background-color: #9ca3af; }
         .file-input-button input[type="file"]::file-selector-button { margin-right: 1rem; padding: 0.5rem 1rem; border-radius: 0.375rem; border-width: 0; font-size: 0.875rem; font-weight: 600; background-color: #A18A76; color: white; cursor: pointer; transition: background-color 0.15s ease-in-out; }
-         .file-input-button input[type="file"]::file-selector-button:hover { background-color: #8B7763; }
-         .file-input-button input[type="file"] { color: #6b7280; }
+        .file-input-button input[type="file"]::file-selector-button:hover { background-color: #8B7763; }
+        .file-input-button input[type="file"] { color: #6b7280; }
         #currentGallery .gallery-item { position: relative; width: 100%; padding-bottom: 100%; overflow: hidden; border-radius: 8px; }
         #currentGallery .gallery-item img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
         #currentGallery .delete-gallery-image-btn { position: absolute; top: 4px; right: 4px; background-color: rgba(229, 62, 62, 0.8); color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; opacity: 0; transition: opacity 0.2s; }
@@ -55,107 +55,107 @@
 
     <div class="flex flex-grow">
         <aside class="w-64 bg-white p-4 shadow-lg min-h-full flex flex-col">
-             <h2 class="text-xl font-semibold mb-4 text-[#3C2A21]">Menú</h2>
-             <nav id="admin-sidebar-nav" class="flex-grow">
-                 <a href="#" class="sidebar-link active" data-section="profileSection" id="profileLink"><i class="fa-solid fa-user-gear fa-fw mr-2"></i>Mi Perfil</a>
-                 <a href="#" class="sidebar-link" data-section="productsSection" id="productsLink" style="display: none;"><i class="fa-solid fa-boxes-stacked fa-fw mr-2"></i>Mis Productos</a>
-                 <a href="#" class="sidebar-link" data-section="locationSection" id="locationLink" style="display: none;"><i class="fa-solid fa-location-dot fa-fw mr-2"></i>Mi Ubicación</a>
-                 <a href="#" class="sidebar-link" data-section="manageLocationsAdminSection" id="manageLocationsAdminLink" style="display: none;"><i class="fa-solid fa-map-marked-alt fa-fw mr-2"></i>Gestionar Ubicaciones</a>
-                 <a href="#" class="sidebar-link" data-section="manageBlogSection" id="manageBlogLink" style="display: none;"><i class="fa-solid fa-pen-to-square fa-fw mr-2"></i>Gestionar Blog</a>
-                 <a href="#" class="sidebar-link" data-section="manageUsersSection" id="manageUsersLink" style="display: none;"><i class="fa-solid fa-users fa-fw mr-2"></i>Gestionar Usuarios</a>
-             </nav>
-             <div class="mt-auto text-sm text-gray-500">
-                 Rol: <span id="userRoleDisplay">Cargando...</span>
-             </div>
+            <h2 class="text-xl font-semibold mb-4 text-[#3C2A21]">Menú</h2>
+            <nav id="admin-sidebar-nav" class="flex-grow">
+                <a href="#" class="sidebar-link active" data-section="profileSection" id="profileLink"><i class="fa-solid fa-user-gear fa-fw mr-2"></i>Mi Perfil</a>
+                <a href="#" class="sidebar-link" data-section="productsSection" id="productsLink" style="display: none;"><i class="fa-solid fa-boxes-stacked fa-fw mr-2"></i>Mis Productos</a>
+                <a href="#" class="sidebar-link" data-section="locationSection" id="locationLink" style="display: none;"><i class="fa-solid fa-location-dot fa-fw mr-2"></i>Mi Ubicación</a>
+                <a href="#" class="sidebar-link" data-section="manageLocationsAdminSection" id="manageLocationsAdminLink" style="display: none;"><i class="fa-solid fa-map-marked-alt fa-fw mr-2"></i>Gestionar Ubicaciones</a>
+                <a href="#" class="sidebar-link" data-section="manageBlogSection" id="manageBlogLink" style="display: none;"><i class="fa-solid fa-pen-to-square fa-fw mr-2"></i>Gestionar Blog</a>
+                <a href="#" class="sidebar-link" data-section="manageUsersSection" id="manageUsersLink" style="display: none;"><i class="fa-solid fa-users fa-fw mr-2"></i>Gestionar Usuarios</a>
+            </nav>
+            <div class="mt-auto text-sm text-gray-500">
+                Rol: <span id="userRoleDisplay">Cargando...</span>
+            </div>
         </aside>
 
         <main class="flex-1 p-6 overflow-y-auto">
             
             <div id="profileSection" class="admin-section active content-area">
-                 <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Mi Perfil y Contacto Público</h2>
-                 <form id="profileForm" class="max-w-4xl mx-auto">
-                     <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Información Pública</h3>
-                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                         <div>
-                             <label for="producerNamePublic" class="form-label">Nombre Público (Finca/Café):</label>
-                             <input type="text" id="producerNamePublic" name="producerNamePublic" class="form-input" required>
-                         </div>
-                         <div>
-                             <label for="emailDisplay" class="form-label">Correo de Cuenta (No editable):</label>
-                             <input type="email" id="emailDisplay" disabled class="form-input bg-gray-100 cursor-not-allowed">
-                         </div>
-                     </div>
-                     <div class="mt-4">
-                         <label for="bio" class="form-label">Acerca de Mí/Nosotros (Bio Pública):</label>
-                         <textarea id="bio" name="bio" rows="3" class="form-input"></textarea>
-                     </div>
-                     <h3 class="text-xl font-medium my-4 text-[#3C2A21]">Opciones de Contacto</h3>
-                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                         <div>
-                             <label for="whatsapp" class="form-label">WhatsApp (Número + Código País):</label>
-                             <input type="text" id="whatsapp" name="contact.whatsapp" class="form-input">
-                         </div>
-                         <div>
-                             <label for="instagram" class="form-label">Instagram (@usuario):</label>
-                             <input type="text" id="instagram" name="contact.instagram" class="form-input">
-                         </div>
-                         <div>
-                             <label for="facebook" class="form-label">Facebook (URL o nombre):</label>
-                             <input type="text" id="facebook" name="contact.facebook" class="form-input">
-                         </div>
-                          <div class="flex items-center mt-6">
-                             <input type="checkbox" id="showEmail" name="contact.showEmail" class="h-4 w-4 text-[#8a5a44] border-gray-300 rounded focus:ring-[#8a5a44]">
-                             <label for="showEmail" class="ml-2 form-label mb-0">Mostrar mi Email de contacto públicamente</label>
-                         </div>
-                     </div>
-                     <div class="flex justify-end mt-6">
-                         <button type="submit" class="form-button form-button-primary px-6">Guardar Perfil</button>
-                     </div>
-                 </form>
+                <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Mi Perfil y Contacto Público</h2>
+                <form id="profileForm" class="max-w-4xl mx-auto">
+                    <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Información Pública</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="producerNamePublic" class="form-label">Nombre Público (Finca/Café):</label>
+                            <input type="text" id="producerNamePublic" name="producerNamePublic" class="form-input" required>
+                        </div>
+                        <div>
+                            <label for="emailDisplay" class="form-label">Correo de Cuenta (No editable):</label>
+                            <input type="email" id="emailDisplay" disabled class="form-input bg-gray-100 cursor-not-allowed">
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label for="bio" class="form-label">Acerca de Mí/Nosotros (Bio Pública):</label>
+                        <textarea id="bio" name="bio" rows="3" class="form-input"></textarea>
+                    </div>
+                    <h3 class="text-xl font-medium my-4 text-[#3C2A21]">Opciones de Contacto</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="whatsapp" class="form-label">WhatsApp (Número + Código País):</label>
+                            <input type="text" id="whatsapp" name="contact.whatsapp" class="form-input">
+                        </div>
+                        <div>
+                            <label for="instagram" class="form-label">Instagram (@usuario):</label>
+                            <input type="text" id="instagram" name="contact.instagram" class="form-input">
+                        </div>
+                        <div>
+                            <label for="facebook" class="form-label">Facebook (URL o nombre):</label>
+                            <input type="text" id="facebook" name="contact.facebook" class="form-input">
+                        </div>
+                        <div class="flex items-center mt-6">
+                            <input type="checkbox" id="showEmail" name="contact.showEmail" class="h-4 w-4 text-[#8a5a44] border-gray-300 rounded focus:ring-[#8a5a44]">
+                            <label for="showEmail" class="ml-2 form-label mb-0">Mostrar mi Email de contacto públicamente</label>
+                        </div>
+                    </div>
+                    <div class="flex justify-end mt-6">
+                        <button type="submit" class="form-button form-button-primary px-6">Guardar Perfil</button>
+                    </div>
+                </form>
 
-                 <hr class="my-8 border-gray-300">
-                 <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Logo o Foto de Perfil</h3>
-                 <form id="profileImageForm" class="max-w-4xl mx-auto">
-                     <div class="mt-4">
-                         <label for="profileImageFile" class="form-label">Subir Logo o Foto (se reemplazará la anterior):</label>
-                         <input type="file" id="profileImageFile" name="profileImage" accept="image/*" class="w-full text-sm text-gray-500 file-input-button">
-                         
-                         <div class="mt-4 relative w-36 h-36">
-                             <img id="currentProfileImage" src="#" alt="Logo actual" class="rounded-full border border-gray-300 shadow-sm" style="width: 150px; height: 150px; object-fit: cover; display: none;">
-                             <button type="button" id="deleteProfileImageBtn" class="absolute top-0 right-0 p-1 bg-red-600 text-white text-xs rounded-full hover:bg-red-700" style="display: none; font-size: 10px; line-height: 1; width: 24px; height: 24px;">
-                                 <i class="fa-solid fa-trash"></i>
-                             </button>
-                         </div>
-                     </div>
-                     <div class="flex justify-end mt-4">
-                         <button type="submit" class="form-button form-button-primary px-6">Guardar Logo</button>
-                     </div>
-                 </form>
+                <hr class="my-8 border-gray-300">
+                <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Logo o Foto de Perfil</h3>
+                <form id="profileImageForm" class="max-w-4xl mx-auto">
+                    <div class="mt-4">
+                        <label for="profileImageFile" class="form-label">Subir Logo o Foto (se reemplazará la anterior):</label>
+                        <input type="file" id="profileImageFile" name="profileImage" accept="image/*" class="w-full text-sm text-gray-500 file-input-button">
+                        
+                        <div class="mt-4 relative w-36 h-36">
+                            <img id="currentProfileImage" src="#" alt="Logo actual" class="rounded-full border border-gray-300 shadow-sm" style="width: 150px; height: 150px; object-fit: cover; display: none;">
+                            <button type="button" id="deleteProfileImageBtn" class="absolute top-0 right-0 p-1 bg-red-600 text-white text-xs rounded-full hover:bg-red-700" style="display: none; font-size: 10px; line-height: 1; width: 24px; height: 24px;">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex justify-end mt-4">
+                        <button type="submit" class="form-button form-button-primary px-6">Guardar Logo</button>
+                    </div>
+                </form>
 
-                 <hr class="my-8 border-gray-300">
-                 <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Galería de Imágenes (Carrusel)</h3>
-                 <form id="galleryUploadForm" class="max-w-4xl mx-auto">
-                     <div class="mt-4">
-                         <label for="galleryImageFiles" class="form-label">Añadir nuevas imágenes (máx. 10 a la vez):</label>
-                         <input type="file" id="galleryImageFiles" name="galleryImages" accept="image/*" multiple 
+                <hr class="my-8 border-gray-300">
+                <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Galería de Imágenes (Carrusel)</h3>
+                <form id="galleryUploadForm" class="max-w-4xl mx-auto">
+                    <div class="mt-4">
+                        <label for="galleryImageFiles" class="form-label">Añadir nuevas imágenes (máx. 10 a la vez):</label>
+                        <input type="file" id="galleryImageFiles" name="galleryImages" accept="image/*" multiple 
                                 class="w-full text-sm text-gray-500 file-input-button">
-                     </div>
-                     <div class="flex justify-end mt-4">
-                         <button type="submit" class="form-button form-button-primary px-6">Añadir Imágenes a Galería</button>
-                     </div>
-                 </form>
-                 <h4 class="text-lg font-medium mt-6 mb-2 text-[#3C2A21]">Galería Actual:</h4>
-                 <div id="currentGallery" class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-                     <p>Cargando galería...</p>
-                 </div>
+                    </div>
+                    <div class="flex justify-end mt-4">
+                        <button type="submit" class="form-button form-button-primary px-6">Añadir Imágenes a Galería</button>
+                    </div>
+                </form>
+                <h4 class="text-lg font-medium mt-6 mb-2 text-[#3C2A21]">Galería Actual:</h4>
+                <div id="currentGallery" class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                    <p>Cargando galería...</p>
+                </div>
             </div>
 
             <div id="productsSection" class="admin-section content-area">
-                 <div class="flex justify-between items-center mb-4">
-                     <h2 class="text-2xl font-semibold text-[#3C2A21]" id="productsSectionTitle">Mis Productos</h2>
-                     <button id="showAddProductFormBtn" class="px-4 py-2 bg-[#3C2A21] text-white rounded-md hover:bg-opacity-80" style="display: none;">Añadir Producto +</button>
-                 </div>
-                 <div id="addProductFormContainer" class="mb-6 p-6 border rounded-lg bg-gray-50 max-w-4xl mx-auto" style="display: none;">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-semibold text-[#3C2A21]" id="productsSectionTitle">Mis Productos</h2>
+                    <button id="showAddProductFormBtn" class="px-4 py-2 bg-[#3C2A21] text-white rounded-md hover:bg-opacity-80" style="display: none;">Añadir Producto +</button>
+                </div>
+                <div id="addProductFormContainer" class="mb-6 p-6 border rounded-lg bg-gray-50 max-w-4xl mx-auto" style="display: none;">
                     <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Nuevo Producto</h3>
                     <form id="addProductForm">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -177,20 +177,20 @@
                             <button type="button" id="cancelAddProductBtn" class="form-button form-button-secondary">Cancelar</button>
                         </div>
                     </form>
-                 </div>
-                 <div class="overflow-x-auto">
-                     <table class="w-full text-sm text-left text-gray-500">
-                         <thead class="text-xs text-[#3C2A21] uppercase bg-gray-100">
-                             <tr>
-                                 <th class="px-6 py-3">Nombre</th> <th class="px-6 py-3">Precio</th> <th class="px-6 py-3">Origen</th>
-                                 <th class="px-6 py-3">Productor</th> <th class="px-6 py-3">Stock</th> <th class="px-6 py-3">Acciones</th>
-                             </tr>
-                         </thead>
-                         <tbody id="products-tbody">
-                             <tr><td colspan="6" class="px-6 py-4 text-center">Cargando...</td></tr>
-                         </tbody>
-                     </table>
-                 </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500">
+                        <thead class="text-xs text-[#3C2A21] uppercase bg-gray-100">
+                            <tr>
+                                <th class="px-6 py-3">Nombre</th> <th class="px-6 py-3">Precio</th> <th class="px-6 py-3">Origen</th>
+                                <th class="px-6 py-3">Productor</th> <th class="px-6 py-3">Stock</th> <th class="px-6 py-3">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-tbody">
+                            <tr><td colspan="6" class="px-6 py-4 text-center">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div id="locationSection" class="admin-section content-area">
@@ -231,124 +231,180 @@
                         <input type="file" id="locationImageFile" name="imageFile" accept="image/*" class="w-full text-sm text-gray-500 file-input-button">
                         <img id="locationImagePreview" src="#" alt="Vista previa" class="mt-2"/>
                     </div>
+                    
                     <div class="flex justify-end mt-6">
                         <button type="submit" class="form-button form-button-primary px-6">Guardar Ubicación</button>
                     </div>
                 </form>
             </div>
+            <div id="manageLocationsAdminSection" class="admin-section content-area">
+                <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Gestionar Todas las Ubicaciones (Admin)</h2>
+                
+                <form id="adminLocationForm" class="mb-8 p-6 border rounded-lg bg-gray-50 max-w-4xl mx-auto">
+                    <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Añadir Nueva Ubicación (Pública)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="adminLocationName" class="form-label">Nombre Finca/Café:</label>
+                            <input type="text" id="adminLocationName" name="locationName" required class="form-input">
+                        </div>
+                        <div>
+                            <label for="adminAddress" class="form-label">Dirección:</label>
+                            <input type="text" id="adminAddress" name="address" required class="form-input">
+                        </div>
+                    </div>
+                    <label class="form-label">Ubicación en el Mapa:</label>
+                    <div id="adminLocationMap"></div> <p class="text-xs text-gray-500 mt-1 mb-4">Haz clic en el mapa para colocar el marcador.</p>
+                    <input type="hidden" id="adminLocationLatitude" name="latitude">
+                    <input type="hidden" id="adminLocationLongitude" name="longitude">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="adminSchedule" class="form-label">Horario:</label>
+                            <input type="text" id="adminSchedule" name="schedule" class="form-input" placeholder="Ej: L-S: 8am - 6pm">
+                        </div>
+                        <div>
+                            <label for="adminSpecialty" class="form-label">Especialidad:</label>
+                            <input type="text" id="adminSpecialty" name="specialty" class="form-input" placeholder="Ej: V60, Chemex">
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label for="adminLocationImageFile" class="form-label">Cargar Imagen (Opcional):</label>
+                        <input type="file" id="adminLocationImageFile" name="imageFile" accept="image/*" class="w-full text-sm text-gray-500 file-input-button">
+                        <img id="adminLocationImagePreview" src="#" alt="Vista previa" class="mt-2"/>
+                    </div>
+                    <div class="flex justify-end mt-6">
+                        <button type="submit" class="form-button form-button-primary px-6">Guardar Ubicación (Admin)</button>
+                    </div>
+                </form>
+
+                <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Ubicaciones Registradas</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500">
+                        <thead class="text-xs text-[#3C2A21] uppercase bg-gray-100">
+                            <tr>
+                                <th class="px-6 py-3">Nombre</th>
+                                <th class="px-6 py-3">Dirección</th>
+                                <th class="px-6 py-3">Dueño (Productor)</th>
+                                <th class="px-6 py-3">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="locations-admin-tbody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
             <div id="manageBlogSection" class="admin-section content-area">
-                 <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Gestionar Blog</h2>
-                 <form id="addPostForm" class="mb-8 p-6 border rounded-lg bg-gray-50 max-w-4xl mx-auto">
-                      <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Crear Entrada</h3>
-                      <div class="mb-4">
-                          <label for="postTitle" class="form-label">Título:</label>
-                          <input type="text" id="postTitle" name="title" required class="form-input">
-                      </div>
-                      <div class="mb-4">
-                          <label for="postContent" class="form-label">Contenido:</label>
-                          <textarea id="postContent" name="content" rows="8" required class="form-input"></textarea>
-                      </div>
-                      <div class="mt-4">
-                            <label for="addPostImageFile" class="form-label">Cargar Imagen (Opcional):</label>
-                            <input type="file" id="addPostImageFile" name="imageFile" accept="image/*" class="w-full text-sm text-gray-500 file-input-button">
-                            <img id="blogImagePreview" src="#" alt="Vista previa" class="mt-2"/>
-                      </div>
-                      <button type="submit" class="w-full form-button form-button-primary mt-6">Publicar</button>
-                 </form>
-                 <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Entradas Publicadas</h3>
-                 <div class="overflow-x-auto">
-                     <table class="w-full text-sm text-left text-gray-500">
-                         <thead class="text-xs text-[#3C2A21] uppercase bg-gray-100">
-                             <tr>
-                                 <th class="px-6 py-3">Título</th>
-                                 <th class="px-6 py-3">Fecha</th>
-                                 <th class="px-6 py-3">Acciones</th>
-                             </tr>
-                         </thead>
-                         <tbody id="posts-tbody">
-                             <tr><td colspan="3" class="px-6 py-4 text-center">Cargando...</td></tr>
-                         </tbody>
-                     </table>
-                 </div>
+                <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Gestionar Blog</h2>
+                <form id="addPostForm" class="mb-8 p-6 border rounded-lg bg-gray-50 max-w-4xl mx-auto">
+                    <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Crear Entrada</h3>
+                    <div class="mb-4">
+                        <label for="postTitle" class="form-label">Título:</label>
+                        <input type="text" id="postTitle" name="title" required class="form-input">
+                    </div>
+                    <div class="mb-4">
+                        <label for="postContent" class="form-label">Contenido:</label>
+                        <textarea id="postContent" name="content" rows="8" required class="form-input"></textarea>
+                    </div>
+                    <div class="mt-4">
+                        <label for="addPostImageFile" class="form-label">Cargar Imagen (Opcional):</label>
+                        <input type="file" id="addPostImageFile" name="imageFile" accept="image/*" class="w-full text-sm text-gray-500 file-input-button">
+                        <img id="blogImagePreview" src="#" alt="Vista previa" class="mt-2"/>
+                    </div>
+                    <button type="submit" class="w-full form-button form-button-primary mt-6">Publicar</button>
+                </form>
+                <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Entradas Publicadas</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500">
+                        <thead class="text-xs text-[#3C2A21] uppercase bg-gray-100">
+                            <tr>
+                                <th class="px-6 py-3">Título</th>
+                                <th class="px-6 py-3">Fecha</th>
+                                <th class="px-6 py-3">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="posts-tbody">
+                            <tr><td colspan="3" class="px-6 py-4 text-center">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-             <div id="manageUsersSection" class="admin-section content-area">
+            <div id="manageUsersSection" class="admin-section content-area">
                 <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Gestionar Usuarios</h2>
-                 <div class="overflow-x-auto">
-                     <table class="w-full text-sm text-left text-gray-500">
-                         <thead class="text-xs text-[#3C2A21] uppercase bg-gray-100">
-                             <tr>
-                                 <th class="px-6 py-3">Email</th>
-                                 <th class="px-6 py-3">Rol</th>
-                                 <th class="px-6 py-3">Acciones</th>
-                             </tr>
-                         </thead>
-                         <tbody id="users-tbody">
-                             <tr><td colspan="3" class="px-6 py-4 text-center">Cargando...</td></tr>
-                         </tbody>
-                     </table>
-                 </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500">
+                        <thead class="text-xs text-[#3C2A21] uppercase bg-gray-100">
+                            <tr>
+                                <th class="px-6 py-3">Email</th>
+                                <th class="px-6 py-3">Rol</th>
+                                <th class="px-6 py-3">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-tbody">
+                            <tr><td colspan="3" class="px-6 py-4 text-center">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div id="editProductModal" class="modal fixed inset-0 z-50 overflow-y-auto hidden items-center justify-center p-4">
                 <div class="fixed inset-0 bg-gray-500 opacity-75 transition-opacity" aria-hidden="true"></div>
                 <div class="modal-content-wrapper relative bg-white rounded-lg text-left overflow-hidden shadow-xl max-w-4xl w-full m-4 transform transition-all">
-                     <div class="bg-white px-6 pt-5 pb-4 sm:p-6 sm:pb-4">
-                         <div class="flex justify-between items-center mb-4">
-                             <h3 class="text-lg font-medium text-gray-900">Editar Producto</h3>
-                             <button id="closeModalBtn" type="button" class="text-gray-400 hover:text-gray-500 text-2xl">&times;</button>
-                         </div>
-                         <form id="editProductForm">
-                             <input type="hidden" id="editProductId" name="id">
-                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                 <div><label for="editName" class="form-label">Nombre:</label><input type="text" id="editName" name="name" required class="form-input"></div>
-                                 <div><label for="editPrice" class="form-label">Precio:</label><input type="number" id="editPrice" name="price" step="0.01" required class="form-input"></div>
-                                 <div><label for="editOrigin" class="form-label">Origen:</label><input type="text" id="editOrigin" name="origin" required class="form-input"></div>
-                                 <div><label for="editProducerName" class="form-label">Productor:</label><input type="text" id="editProducerName" name="producerName" class="form-input"></div>
-                                 <div><label for="editRoastLevel" class="form-label">Tueste:</label><select id="editRoastLevel" name="roastLevel" class="form-input"><option value="Claro">Claro</option><option value="Medio">Medio</option><option value="Oscuro">Oscuro</option></select></div>
-                                 <div><label for="editStock" class="form-label">Stock:</label><input type="number" id="editStock" name="stock" class="form-input"></div>
-                             </div>
-                             <div class="mt-4"><label for="editDescription" class="form-label">Descripción:</label><textarea id="editDescription" name="description" rows="4" required class="form-input"></textarea></div>
-                             <div class="mt-4">
-                                 <label for="editImageFile" class="form-label">Cambiar Imagen:</label>
-                                 <input type="file" id="editImageFile" name="imageFile" accept="image/*" class="w-full text-sm text-gray-500 file-input-button">
-                                 <img id="editImagePreview" src="#" alt="Vista previa" class="mt-2"/>
-                             </div>
-                         </form>
-                     </div>
-                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                         <button type="submit" form="editProductForm" class="w-full sm:w-auto inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium form-button form-button-primary">Actualizar</button>
-                         <button type="button" id="cancelEditBtn" class="mt-3 w-full sm:mt-0 sm:ml-3 sm:w-auto inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50">Cancelar</button>
-                     </div>
+                    <div class="bg-white px-6 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-medium text-gray-900">Editar Producto</h3>
+                            <button id="closeModalBtn" type="button" class="text-gray-400 hover:text-gray-500 text-2xl">&times;</button>
+                        </div>
+                        <form id="editProductForm">
+                            <input type="hidden" id="editProductId" name="id">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div><label for="editName" class="form-label">Nombre:</label><input type="text" id="editName" name="name" required class="form-input"></div>
+                                <div><label for="editPrice" class="form-label">Precio:</label><input type="number" id="editPrice" name="price" step="0.01" required class="form-input"></div>
+                                <div><label for="editOrigin" class="form-label">Origen:</label><input type="text" id="editOrigin" name="origin" required class="form-input"></div>
+                                <div><label for="editProducerName" class="form-label">Productor:</label><input type="text" id="editProducerName" name="producerName" class="form-input"></div>
+                                <div><label for="editRoastLevel" class="form-label">Tueste:</label><select id="editRoastLevel" name="roastLevel" class="form-input"><option value="Claro">Claro</option><option value="Medio">Medio</option><option value="Oscuro">Oscuro</option></select></div>
+                                <div><label for="editStock" class="form-label">Stock:</label><input type="number" id="editStock" name="stock" class="form-input"></div>
+                            </div>
+                            <div class="mt-4"><label for="editDescription" class="form-label">Descripción:</label><textarea id="editDescription" name="description" rows="4" required class="form-input"></textarea></div>
+                            <div class="mt-4">
+                                <label for="editImageFile" class="form-label">Cambiar Imagen:</label>
+                                <input type="file" id="editImageFile" name="imageFile" accept="image/*" class="w-full text-sm text-gray-500 file-input-button">
+                                <img id="editImagePreview" src="#" alt="Vista previa" class="mt-2"/>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="submit" form="editProductForm" class="w-full sm:w-auto inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium form-button form-button-primary">Actualizar</button>
+                        <button type="button" id="cancelEditBtn" class="mt-3 w-full sm:mt-0 sm:ml-3 sm:w-auto inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50">Cancelar</button>
+                    </div>
                 </div>
             </div>
             
             <div id="editPostModal" class="modal fixed inset-0 z-50 overflow-y-auto hidden items-center justify-center p-4">
                 <div class="fixed inset-0 bg-gray-500 opacity-75 transition-opacity" aria-hidden="true"></div>
                 <div class="modal-content-wrapper relative bg-white rounded-lg text-left overflow-hidden shadow-xl max-w-4xl w-full m-4 transform transition-all">
-                     <div class="bg-white px-6 pt-5 pb-4 sm:p-6 sm:pb-4">
-                         <div class="flex justify-between items-center mb-4">
-                             <h3 class="text-lg font-medium text-gray-900">Editar Entrada de Blog</h3>
-                             <button id="closePostModalBtn" type="button" class="text-gray-400 hover:text-gray-500 text-2xl">&times;</button>
-                         </div>
-                         <form id="editPostForm">
-                             <input type="hidden" id="editPostId" name="id">
-                             <div class="mb-4">
-                                 <label for="editPostTitle" class="form-label">Título:</label>
-                                 <input type="text" id="editPostTitle" name="title" required class="form-input">
-                             </div>
-                             <div class="mt-4"><label for="editPostContent" class="form-label">Contenido:</label><textarea id="editPostContent" name="content" rows="8" required class="form-input"></textarea></div>
-                             <div class="mt-4">
-                                 <label for="editPostImageFile" class="form-label">Cambiar Imagen:</label>
-                                 <input type="file" id="editPostImageFile" name="imageFile" accept="image/*" class="w-full text-sm text-gray-500 file-input-button">
-                                 <img id="editPostImagePreview" src="#" alt="Vista previa" class="mt-2"/>
-                             </div>
-                         </form>
-                     </div>
-                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                         <button type="submit" form="editPostForm" class="w-full sm:w-auto inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium form-button form-button-primary">Actualizar Post</button>
-                         <button type="button" id="cancelPostEditBtn" class="mt-3 w-full sm:mt-0 sm:ml-3 sm:w-auto inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50">Cancelar</button>
-                     </div>
+                    <div class="bg-white px-6 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-medium text-gray-900">Editar Entrada de Blog</h3>
+                            <button id="closePostModalBtn" type="button" class="text-gray-400 hover:text-gray-500 text-2xl">&times;</button>
+                        </div>
+                        <form id="editPostForm">
+                            <input type="hidden" id="editPostId" name="id">
+                            <div class="mb-4">
+                                <label for="editPostTitle" class="form-label">Título:</label>
+                                <input type="text" id="editPostTitle" name="title" required class="form-input">
+                            </div>
+                            <div class="mt-4"><label for="editPostContent" class="form-label">Contenido:</label><textarea id="editPostContent" name="content" rows="8" required class="form-input"></textarea></div>
+                            <div class="mt-4">
+                                <label for="editPostImageFile" class="form-label">Cambiar Imagen:</label>
+                                <input type="file" id="editPostImageFile" name="imageFile" accept="image/*" class="w-full text-sm text-gray-500 file-input-button">
+                                <img id="editPostImagePreview" src="#" alt="Vista previa" class="mt-2"/>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="submit" form="editPostForm" class="w-full sm:w-auto inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium form-button form-button-primary">Actualizar Post</button>
+                        <button type="button" id="cancelPostEditBtn" class="mt-3 w-full sm:mt-0 sm:ml-3 sm:w-auto inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50">Cancelar</button>
+                    </div>
                 </div>
             </div>
 

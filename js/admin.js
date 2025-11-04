@@ -201,9 +201,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (sectionId === 'productsSection') loadProducts();
         if (sectionId === 'manageBlogSection') loadPosts();
         if (sectionId === 'locationSection') initializeLocationMap();
+        
+        // CORRECCIÓN CRÍTICA PARA EL MAPA ADMIN (invalidateSize)
         if (sectionId === 'manageLocationsAdminSection') {
-            initializeAdminLocationMap();
-            loadAllLocations();
+            // Se añade un pequeño retraso para asegurar que la sección esté visible 
+            // antes de que Leaflet intente calcular el tamaño del mapa.
+            setTimeout(() => {
+                initializeAdminLocationMap();
+                loadAllLocations();
+            }, 100); 
         }
         if (sectionId === 'manageUsersSection') loadUsers(); 
     }
@@ -623,42 +629,49 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 const location = await response.json();
                 if (location && location.locationName) {
-                     document.getElementById('locationName').value = location.locationName || '';
-                     document.getElementById('address').value = location.address || '';
-                     document.getElementById('schedule').value = location.schedule || '';
-                     document.getElementById('specialty').value = location.specialty || '';
-                     if(locationLatitudeInput) locationLatitudeInput.value = location.latitude || '';
-                     if(locationLongitudeInput) locationLongitudeInput.value = location.longitude || '';
-                     
-                     const imageUrl = location.imageUrl ? (location.imageUrl.startsWith('http') ? location.imageUrl : `/${location.imageUrl}`) : '#';
-                     if (locationImagePreview) {
-                         locationImagePreview.src = imageUrl;
-                         locationImagePreview.style.display = location.imageUrl ? 'block' : 'none';
-                     }
-                     if (locationMap && location.latitude && location.longitude) {
-                         const latLng = [location.latitude, location.longitude];
-                         if (locationMarker) { locationMarker.setLatLng(latLng); }
-                         else {
-                             locationMarker = L.marker(latLng, { draggable: true }).addTo(locationMap).bindPopup("Tu ubicación. Puedes arrastrarme.").openPopup();
-                              locationMarker.on('dragend', function(event){
-                                   var marker = event.target; var position = marker.getLatLng();
-                                   if(locationLatitudeInput) locationLatitudeInput.value = position.lat.toFixed(6);
-                                   if(locationLongitudeInput) locationLongitudeInput.value = position.lng.toFixed(6);
-                                   locationMap.panTo(position);
-                               });
-                         }
-                         locationMap.setView(latLng, 13);
-                     }
+                    // Rellena los campos de texto
+                    document.getElementById('locationName').value = location.locationName || '';
+                    document.getElementById('address').value = location.address || '';
+                    document.getElementById('schedule').value = location.schedule || '';
+                    document.getElementById('specialty').value = location.specialty || '';
+                    
+                    // Rellena los campos ocultos de coordenadas
+                    if(locationLatitudeInput) locationLatitudeInput.value = location.latitude || '';
+                    if(locationLongitudeInput) locationLongitudeInput.value = location.longitude || '';
+                    
+                    const imageUrl = location.imageUrl ? (location.imageUrl.startsWith('http') ? location.imageUrl : `/${location.imageUrl}`) : '#';
+                    if (locationImagePreview) {
+                        locationImagePreview.src = imageUrl;
+                        locationImagePreview.style.display = location.imageUrl ? 'block' : 'none';
+                    }
+                    if (locationMap && location.latitude && location.longitude) {
+                        const latLng = [location.latitude, location.longitude];
+                        if (locationMarker) { locationMarker.setLatLng(latLng); }
+                        else {
+                            locationMarker = L.marker(latLng, { draggable: true }).addTo(locationMap).bindPopup("Tu ubicación. Puedes arrastrarme.").openPopup();
+                            locationMarker.on('dragend', function(event){
+                                var marker = event.target; var position = marker.getLatLng();
+                                if(locationLatitudeInput) locationLatitudeInput.value = position.lat.toFixed(6);
+                                if(locationLongitudeInput) locationLongitudeInput.value = position.lng.toFixed(6);
+                                locationMap.panTo(position);
+                            });
+                        }
+                        locationMap.setView(latLng, 13);
+                    } else if (locationMap) {
+                        locationForm.reset();
+                        locationImagePreview.style.display = 'none';
+                        locationMap.setView([15.7835, -90.2308], 7);
+                        if(locationMarker) { locationMap.removeLayer(locationMarker); locationMarker = null; }
+                    }
                 } else if (locationMap) {
-                     locationForm.reset();
-                     locationImagePreview.style.display = 'none';
-                     locationMap.setView([15.7835, -90.2308], 7);
-                     if(locationMarker) { locationMap.removeLayer(locationMarker); locationMarker = null; }
+                    locationForm.reset();
+                    locationImagePreview.style.display = 'none';
+                    locationMap.setView([15.7835, -90.2308], 7);
+                    if(locationMarker) { locationMap.removeLayer(locationMarker); locationMarker = null; }
                 }
             }
         } catch (error) { showToast('Error al cargar tu ubicación.', 'error'); }
-    }
-    
+    }    
     if (locationForm) {
         locationForm.addEventListener('submit', async (e) => {
              e.preventDefault();
@@ -682,23 +695,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================================================
 
     function initializeAdminLocationMap() {
-        if (adminLocationMapElement && !adminLocationMap) {
-            adminLocationMap = L.map('adminLocationMap').setView([15.7835, -90.2308], 7);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(adminLocationMap);
-            
-            adminLocationMap.on('click', function(e) {
-                const lat = e.latlng.lat; const lng = e.latlng.lng;
-                if(adminLocationLatitudeInput) adminLocationLatitudeInput.value = lat.toFixed(6);
-                if(adminLocationLongitudeInput) adminLocationLongitudeInput.value = lng.toFixed(6);
-                if (adminLocationMarker) { adminLocationMarker.setLatLng(e.latlng); }
-                else {
-                    adminLocationMarker = L.marker(e.latlng, { draggable: true }).addTo(adminLocationMap).bindPopup("Ubicación seleccionada.").openPopup();
-                }
-                adminLocationMap.panTo(e.latlng);
-            });
-        } else if (adminLocationMap) {
-             setTimeout(() => { if (adminLocationMap) adminLocationMap.invalidateSize(); }, 100); 
-        }
+    if (adminLocationMapElement && !adminLocationMap) {
+        adminLocationMap = L.map('adminLocationMap').setView([15.7835, -90.2308], 7);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(adminLocationMap);
+        
+        adminLocationMap.on('click', function(e) {
+            const lat = e.latlng.lat; const lng = e.latlng.lng;
+            if(adminLocationLatitudeInput) adminLocationLatitudeInput.value = lat.toFixed(6);
+            if(adminLocationLongitudeInput) adminLocationLongitudeInput.value = lng.toFixed(6);
+            if (adminLocationMarker) { adminLocationMarker.setLatLng(e.latlng); }
+            else {
+                adminLocationMarker = L.marker(e.latlng, { draggable: true }).addTo(adminLocationMap).bindPopup("Ubicación seleccionada.").openPopup();
+            }
+            adminLocationMap.panTo(e.latlng);
+        });
+    } else if (adminLocationMap) {
+        // CORRECCIÓN/MEJORA: Redibujar el mapa si ya existe (el contenedor ha cambiado de display: none a block)
+        adminLocationMap.invalidateSize(); 
+        // Nota: El setTimeout ya está en switchSection, aquí solo lo ejecutamos directamente.
+    }
     }
 
     async function loadAllLocations() {
