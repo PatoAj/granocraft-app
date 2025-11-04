@@ -3,7 +3,7 @@
 // Función para cargar los productos de la API
 async function fetchProducts() {
     try {
-        // Usa la ruta API pública que ahora POPULA los datos del productor
+        // Usa la ruta API pública de los datos del productor
         const response = await fetch('/api/products'); 
         if (!response.ok) {
             throw new Error(`Error al cargar productos: ${response.status}`);
@@ -29,7 +29,6 @@ function createProductCard(product) {
     }
 
     // 2. Determinar el nombre público y el enlace
-    // Accedemos a product.owner.producerNamePublic que viene del .populate()
     const producerId = product.owner ? product.owner._id : '#';
     const producerPublicName = product.owner ? (product.owner.producerNamePublic || 'Productor Anónimo') : (product.producerName || 'Productor Desconocido');
 

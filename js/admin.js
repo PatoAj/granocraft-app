@@ -1,21 +1,17 @@
-// GranoCraft/js/admin.js (IMPLEMENTACIÓN FINAL Y COMPLETA)
+// GranoCraft/js/admin.js
 
-// Función Toast (definida globalmente para que esté disponible de inmediato)
 function showToast(message, type = 'success') {
     const container = document.getElementById('toast-container');
-    if (!container) return alert(message); // Fallback si el HTML no existe
-
+    if (!container) return alert(message); 
     const toast = document.createElement('div');
     toast.className = `toast ${type === 'success' ? 'toast-success' : 'toast-error'}`;
     toast.textContent = message;
     container.appendChild(toast);
-
     setTimeout(() => {
-        // Asegurarse de que el toast todavía exista antes de intentar removerlo
         if (toast.parentElement === container) {
             container.removeChild(toast);
         }
-    }, 3500); // La animación dura 3s + 0.5s de salida
+    }, 3500);
 }
 
 
@@ -41,22 +37,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModalBtn = document.getElementById('closeModalBtn');
     const cancelEditBtn = document.getElementById('cancelEditBtn');
 
-    // Perfil (Formulario de Texto)
+    // Perfil
     const profileForm = document.getElementById('profileForm');
-    let userProfileData = {}; // Guardar los datos del perfil cargado
-
-    // Perfil (NUEVO: Formulario de Logo)
+    let userProfileData = {}; 
     const profileImageForm = document.getElementById('profileImageForm');
     const profileImageFileInput = document.getElementById('profileImageFile');
     const currentProfileImage = document.getElementById('currentProfileImage');
     const deleteProfileImageBtn = document.getElementById('deleteProfileImageBtn');
-
-    // Perfil (NUEVO: Formulario de Galería)
     const galleryUploadForm = document.getElementById('galleryUploadForm');
     const galleryImageFilesInput = document.getElementById('galleryImageFiles');
     const currentGalleryContainer = document.getElementById('currentGallery');
 
-    // Ubicación
+    // Ubicación (Productor)
     const locationForm = document.getElementById('locationForm'); 
     const locationMapElement = document.getElementById('locationMap'); 
     const locationLatitudeInput = document.getElementById('locationLatitude');
@@ -64,6 +56,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const locationImagePreview = document.getElementById('locationImagePreview'); 
     let locationMap = null;
     let locationMarker = null;
+
+    // Ubicación (Admin)
+    const adminLocationForm = document.getElementById('adminLocationForm');
+    const adminLocationMapElement = document.getElementById('adminLocationMap');
+    const adminLocationLatitudeInput = document.getElementById('adminLocationLatitude');
+    const adminLocationLongitudeInput = document.getElementById('adminLocationLongitude');
+    const adminLocationImagePreview = document.getElementById('adminLocationImagePreview');
+    const locationsAdminTbody = document.getElementById('locations-admin-tbody');
+    let adminLocationMap = null;
+    let adminLocationMarker = null;
 
     // Blog
     const postsTbody = document.getElementById('posts-tbody'); 
@@ -99,11 +101,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userRoleDisplay) userRoleDisplay.textContent = userRole.toUpperCase();
     } catch (e) {
         if (userRoleDisplay) userRoleDisplay.textContent = 'ERROR';
+        console.error("Error decodificando token:", e);
+        localStorage.removeItem('authToken');
+        window.location.href = 'login.html';
+        return;
     }
 
     // Ocultar/Mostrar enlaces
     const productsLink = document.getElementById('productsLink');
     const locationLink = document.getElementById('locationLink');
+    const manageLocationsAdminLink = document.getElementById('manageLocationsAdminLink'); // NUEVO
     const manageBlogLink = document.getElementById('manageBlogLink');
     const manageUsersLink = document.getElementById('manageUsersLink');
     const productsSectionTitle = document.getElementById('productsSectionTitle');
@@ -114,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (showAddProductFormBtn) showAddProductFormBtn.style.display = 'block';
     } else if (userRole === 'admin') {
         if (productsLink) productsLink.style.display = 'block';
+        if (manageLocationsAdminLink) manageLocationsAdminLink.style.display = 'block'; // NUEVO
         if (manageBlogLink) manageBlogLink.style.display = 'block';
         if (manageUsersLink) manageUsersLink.style.display = 'block';
         if (productsSectionTitle) productsSectionTitle.textContent = 'Todos los Productos (Admin)';
@@ -147,6 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupImagePreview('addPostImageFile', 'blogImagePreview');
     setupImagePreview('editPostImageFile', 'editPostImagePreview');
     setupImagePreview('profileImageFile', 'currentProfileImage');
+    setupImagePreview('adminLocationImageFile', 'adminLocationImagePreview');
 
     function switchSection(sectionId) {
         adminSections.forEach(section => section.classList.remove('active'));
@@ -167,6 +176,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (sectionId === 'productsSection') loadProducts();
         if (sectionId === 'manageBlogSection') loadPosts();
         if (sectionId === 'locationSection') initializeLocationMap();
+        if (sectionId === 'manageLocationsAdminSection') {
+            initializeAdminLocationMap();
+            loadAllLocations();
+        }
         if (sectionId === 'manageUsersSection') loadUsers(); 
     }
 
@@ -200,14 +213,14 @@ document.addEventListener('DOMContentLoaded', () => {
             userProfileData = await response.json(); 
             
             // 1. Rellenar formulario de texto
-            document.getElementById('emailDisplay').value = userProfileData.email || '';
-            document.getElementById('producerNamePublic').value = userProfileData.producerNamePublic || '';
-            document.getElementById('bio').value = userProfileData.bio || '';
+            if(document.getElementById('emailDisplay')) document.getElementById('emailDisplay').value = userProfileData.email || '';
+            if(document.getElementById('producerNamePublic')) document.getElementById('producerNamePublic').value = userProfileData.producerNamePublic || '';
+            if(document.getElementById('bio')) document.getElementById('bio').value = userProfileData.bio || '';
             const contact = userProfileData.contact || {};
-            document.getElementById('whatsapp').value = contact.whatsapp || '';
-            document.getElementById('instagram').value = contact.instagram || '';
-            document.getElementById('facebook').value = contact.facebook || '';
-            document.getElementById('showEmail').checked = !!contact.showEmail; 
+            if(document.getElementById('whatsapp')) document.getElementById('whatsapp').value = contact.whatsapp || '';
+            if(document.getElementById('instagram')) document.getElementById('instagram').value = contact.instagram || '';
+            if(document.getElementById('facebook')) document.getElementById('facebook').value = contact.facebook || '';
+            if(document.getElementById('showEmail')) document.getElementById('showEmail').checked = !!contact.showEmail; 
 
             // 2. Cargar Logo/Foto de Perfil
             loadProfileImage(userProfileData.profileImage);
@@ -220,7 +233,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Guardar Perfil (Formulario de Texto)
     if (profileForm) {
         profileForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -257,7 +269,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Lógica de Logo/Foto de Perfil ---
     function loadProfileImage(imageUrl) {
         if (imageUrl) {
             currentProfileImage.src = `/${imageUrl}`;
@@ -317,20 +328,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Lógica de Galería/Carrusel ---
     function loadGallery(images) {
         currentGalleryContainer.innerHTML = ''; 
         if (images && images.length > 0) {
             images.forEach(imageUrl => {
                 const galleryItem = document.createElement('div');
-                galleryItem.className = 'relative group';
+                galleryItem.className = 'relative group gallery-item';
                 galleryItem.innerHTML = `
                     <img src="/${imageUrl}" alt="Imagen de galería" 
                          class="w-full h-32 object-cover rounded-lg shadow-sm">
                     <button type="button" data-image-url="${imageUrl}" 
-                            class="delete-gallery-image-btn absolute top-1 right-1 p-1 bg-red-600 text-white rounded-full 
-                                   opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                            style="font-size: 10px; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;">
+                            class="delete-gallery-image-btn"
+                            style="font-size: 10px; width: 24px; height: 24px;">
                         <i class="fa-solid fa-times"></i>
                     </button>
                 `;
@@ -431,11 +440,26 @@ document.addEventListener('DOMContentLoaded', () => {
                         </td>
                     </tr>
                 `).join('');
+                
+                productsTbody.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', (e) => deleteProduct(e.target.getAttribute('data-id'))));
+                productsTbody.querySelectorAll('.edit-btn').forEach(btn => btn.addEventListener('click', (e) => openEditProductModal(e.target.getAttribute('data-id'))));
             }
         } catch (err) {
             productsTbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-red-600">Error al cargar productos.</td></tr>';
             showToast('Error cargando productos. ¿Token válido?', 'error');
         }
+    }
+    
+    async function deleteProduct(productId) {
+        if (!confirm('¿Eliminar este producto?')) return;
+        try {
+            const response = await fetch(`/api/products/${productId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) { showToast('Producto eliminado.', 'success'); loadProducts(); } 
+            else { const err = await response.text(); showToast(`Error al eliminar: ${err}`, 'error'); }
+        } catch (err) { showToast('Error de red.', 'error'); }
     }
 
     if (showAddProductFormBtn && addProductFormContainer) {
@@ -475,28 +499,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (productsTbody) {
-        productsTbody.addEventListener('click', async (e) => {
-            const target = e.target;
-            const productId = target.getAttribute('data-id');
-
-            if (target.classList.contains('delete-btn') && productId) {
-                if (!confirm('¿Eliminar este producto?')) return;
-                try {
-                    const response = await fetch(`/api/products/${productId}`, {
-                        method: 'DELETE',
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    if (response.ok) { showToast('Producto eliminado.', 'success'); loadProducts(); } 
-                    else { const err = await response.text(); showToast(`Error al eliminar: ${err}`, 'error'); }
-                } catch (err) { showToast('Error de red.', 'error'); }
-            }
-            if (target.classList.contains('edit-btn') && productId) {
-                 await openEditProductModal(productId);
-            }
-        });
-    }
-    
     async function openEditProductModal(productId) {
         try {
             const response = await fetch(`/api/products/${productId}`);
@@ -555,7 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================================
-    // MÓDULO DE UBICACIÓN
+    // MÓDULO DE UBICACIÓN (PRODUCTOR)
     // =========================================================================
     
     function initializeLocationMap() {
@@ -644,6 +646,103 @@ document.addEventListener('DOMContentLoaded', () => {
              } catch (error) { showToast('Error de red.', 'error'); }
         });
     }
+
+    // =========================================================================
+    // MÓDULO DE UBICACIÓN (ADMIN)
+    // =========================================================================
+
+    function initializeAdminLocationMap() {
+        if (adminLocationMapElement && !adminLocationMap) {
+            adminLocationMap = L.map('adminLocationMap').setView([15.7835, -90.2308], 7);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(adminLocationMap);
+            
+            adminLocationMap.on('click', function(e) {
+                const lat = e.latlng.lat; const lng = e.latlng.lng;
+                if(adminLocationLatitudeInput) adminLocationLatitudeInput.value = lat.toFixed(6);
+                if(adminLocationLongitudeInput) adminLocationLongitudeInput.value = lng.toFixed(6);
+                if (adminLocationMarker) { adminLocationMarker.setLatLng(e.latlng); }
+                else {
+                    adminLocationMarker = L.marker(e.latlng, { draggable: true }).addTo(adminLocationMap).bindPopup("Ubicación seleccionada.").openPopup();
+                }
+                adminLocationMap.panTo(e.latlng);
+            });
+        } else if (adminLocationMap) {
+             setTimeout(() => { if (adminLocationMap) adminLocationMap.invalidateSize(); }, 100); 
+        }
+    }
+
+    async function loadAllLocations() {
+        if (userRole !== 'admin' || !locationsAdminTbody) return;
+        locationsAdminTbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center">Cargando ubicaciones...</td></tr>';
+        
+        try {
+            const response = await fetch('/api/admin/locations', { headers: { 'Authorization': `Bearer ${token}` } });
+            if (response.status === 401) { window.location.href = 'login.html'; return; }
+            if (!response.ok) throw new Error(`Error ${response.status}`);
+            
+            const locations = await response.json();
+            
+            if (locations.length === 0) {
+                locationsAdminTbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center">No hay ubicaciones registradas.</td></tr>';
+            } else {
+                locationsAdminTbody.innerHTML = locations.map(loc => `
+                    <tr class="bg-white border-b hover:bg-gray-50">
+                        <td class="px-6 py-4 font-medium">${loc.locationName}</td>
+                        <td class="px-6 py-4">${loc.address}</td>
+                        <td class="px-6 py-4">${loc.owner ? loc.owner.email : '<i>(Sin dueño/Admin)</i>'}</td>
+                        <td class="px-6 py-4 table-actions">
+                            <button class="delete-location-btn delete-btn" data-id="${loc._id}">Eliminar</button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                locationsAdminTbody.querySelectorAll('.delete-location-btn').forEach(btn => btn.addEventListener('click', deleteAdminLocation));
+            }
+        } catch (err) {
+            locationsAdminTbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-red-600">Error al cargar ubicaciones.</td></tr>';
+            showToast('Error cargando ubicaciones.', 'error');
+        }
+    }
+    
+    if (adminLocationForm) {
+        adminLocationForm.addEventListener('submit', async (e) => {
+             e.preventDefault();
+             if (!adminLocationLatitudeInput.value || !adminLocationLongitudeInput.value) {
+                 showToast('Por favor, haz clic en el mapa para seleccionar la ubicación.', 'error'); return;
+             }
+             const formData = new FormData(adminLocationForm);
+             
+             try {
+                 const response = await fetch('/api/admin/locations', { method: 'POST', headers: { 'Authorization': `Bearer ${token}` }, body: formData });
+                 if (response.ok) { 
+                     showToast('Ubicación creada por Admin.', 'success'); 
+                     adminLocationForm.reset();
+                     if (adminLocationImagePreview) adminLocationImagePreview.style.display = 'none';
+                     if (adminLocationMarker) adminLocationMap.removeLayer(adminLocationMarker);
+                     adminLocationMarker = null;
+                     loadAllLocations();
+                 }
+                 else { const err = await response.text(); showToast(`Error: ${err}`, 'error'); }
+             } catch (error) { showToast('Error de red.', 'error'); }
+        });
+    }
+
+    async function deleteAdminLocation(e) {
+        const locationId = e.target.getAttribute('data-id');
+        if (!confirm('¿Eliminar esta ubicación? (Esta acción es permanente)')) return;
+        try {
+            const response = await fetch(`/api/admin/locations/${locationId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) { 
+                showToast('Ubicación eliminada.', 'success'); 
+                loadAllLocations(); 
+            }
+            else { const err = await response.text(); showToast(`Error al eliminar: ${err}`, 'error'); }
+        } catch (err) { showToast('Error de red.', 'error'); }
+    }
+
 
     // =========================================================================
     // MÓDULO DE BLOG (ADMIN)
@@ -872,6 +971,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================================================
     // 5. INICIALIZACIÓN FINAL
     // =========================================================================
-    const initialSection = 'profileSection'; // Todos inician en "Mi Perfil"
+    const initialSection = 'profileSection';
     switchSection(initialSection); 
 });

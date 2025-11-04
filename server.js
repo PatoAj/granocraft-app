@@ -1,4 +1,4 @@
-// GranoCraft/server.js
+// GranoCraft/server.js (Versión Final Completa)
 
 // 1. IMPORTACIONES
 const express = require('express');
@@ -20,15 +20,14 @@ const Location = require('./models/Location');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DB_URL = process.env.MONGODB_URI || 'mongodb://localhost:27017/granocraft_db';
-// Clave Fija Literal para eliminar errores de .env
 const JWT_LITERAL_SECRET = "EstaEsMiLlaveSecretaParaGranoCraft2025"; 
 
 // 3. CONEXIÓN A MONGODB
 mongoose.connect(DB_URL)
-    .then(() => console.log('✅ Conexión exitosa a MongoDB.'))
-    .catch(err => {
-        console.error('❌ Error de conexión a la Base de Datos:', err.message);
-    });
+    .then(() => console.log('✅ Conexión exitosa a MongoDB.'))
+    .catch(err => {
+        console.error('❌ Error de conexión a la Base de Datos:', err.message);
+    });
 
 // 4. MIDDLEWARE BASE
 app.use(express.urlencoded({ extended: true }));
@@ -37,16 +36,16 @@ app.use(express.json());
 // --- CONFIGURACIÓN DE MULTER ---
 const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir);
-    console.log('Carpeta "uploads" creada.');
+    fs.mkdirSync(uploadsDir);
+    console.log('Carpeta "uploads" creada.');
 }
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) { cb(null, 'uploads/'); },
-    filename: function (req, file, cb) { cb(null, Date.now() + '-' + file.originalname.replace(/\s+/g, '-')); }
+    destination: function (req, file, cb) { cb(null, 'uploads/'); },
+    filename: function (req, file, cb) { cb(null, Date.now() + '-' + file.originalname.replace(/\s+/g, '-')); }
 });
 const fileFilter = (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) { cb(null, true); } 
-    else { cb(new Error('Solo se permiten archivos de imagen.'), false); }
+    if (file.mimetype.startsWith('image/')) { cb(null, true); } 
+    else { cb(new Error('Solo se permiten archivos de imagen.'), false); }
 };
 const upload = multer({ storage: storage, fileFilter: fileFilter, limits: { fileSize: 1024 * 1024 * 5 } });
 
@@ -54,40 +53,38 @@ const upload = multer({ storage: storage, fileFilter: fileFilter, limits: { file
 app.use('/uploads', express.static(uploadsDir));
 app.use(express.static(path.join(__dirname))); 
 
-// --- Middlewares de Autenticación y Roles (Versión Estable ASÍNCRONA) ---
-const protect = async (req, res, next) => { // Importante que sea async
-    let token;
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-        try {
-            token = req.headers.authorization.split(' ')[1];
-            // 1. Verificar el token con la clave fija
-            const decoded = jwt.verify(token, JWT_LITERAL_SECRET);
-            
-            // 2. Buscar al usuario en la DB (Necesario para admin.js)
+// --- Middlewares de Autenticación y Roles  ---
+const protect = async (req, res, next) => {
+    let token;
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        try {
+            token = req.headers.authorization.split(' ')[1];
+            const decoded = jwt.verify(token, JWT_LITERAL_SECRET);
+            
             const user = await User.findById(decoded.id).select('-password');
             if (!user) {
                 return res.status(401).send('No autorizado, usuario no encontrado.');
             }
-            
-            req.user = user; // Adjuntar el objeto User completo
-            next(); 
-        } catch (error) {
-            console.error('Fallo de verificación JWT:', error.message);
-            return res.status(401).send('No autorizado, token fallido o expirado.'); 
-        }
-    } else {
-        return res.status(401).send('No autorizado, no hay token.');
-    }
+            
+            req.user = user; 
+            next(); 
+        } catch (error) {
+            console.error('Fallo de verificación JWT:', error.message);
+            return res.status(401).send('No autorizado, token fallido o expirado.'); 
+        }
+    } else {
+        return res.status(401).send('No autorizado, no hay token.');
+    }
 };
 
 const isAdmin = (req, res, next) => {
-    if (req.user && req.user.role === 'admin') { next(); } 
-    else { res.status(403).send('Acción no autorizada. Requiere rol de administrador.'); }
+    if (req.user && req.user.role === 'admin') { next(); } 
+    else { res.status(403).send('Acción no autorizada. Requiere rol de administrador.'); }
 };
 
 const isProducer = (req, res, next) => {
-    if (req.user && req.user.role === 'producer') { next(); } 
-    else { res.status(403).send('Acción no autorizada. Requiere rol de productor.'); }
+    if (req.user && req.user.role === 'producer') { next(); } 
+    else { res.status(403).send('Acción no autorizada. Requiere rol de productor.'); }
 };
 
 
@@ -96,7 +93,7 @@ const isProducer = (req, res, next) => {
 // **********************************************
 
 // --- Rutas de Autenticación ---
-app.post('/register', async (req, res) => {
+app.post('/register', async (req, res) => { 
     const { email, password } = req.body;
     try {
         const existingUser = await User.findOne({ email });
@@ -109,16 +106,13 @@ app.post('/register', async (req, res) => {
         res.status(500).send('Error interno del servidor durante el registro.');
     }
 });
-
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ email });
         if (!user) return res.status(401).send('Credenciales inválidas (usuario no encontrado).');
-
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(401).send('Credenciales inválidas (contraseña incorrecta).');
-
         const payload = { id: user._id, role: user.role, email: user.email }; 
         const token = jwt.sign(payload, JWT_LITERAL_SECRET, { expiresIn: '7d' });
         res.status(200).json({ message: 'Inicio de sesión exitoso.', token: token, role: user.role });
@@ -138,28 +132,24 @@ app.get('/api/public/profile/:id', async (req, res) => {
     }
 });
 
-// --- API: Gestión de Perfil (Propio) ---
+// --- API: Gestión de Perfil ---
 app.get('/api/profile', protect, async (req, res) => {
     try {
-        // 'req.user' ya es el objeto de usuario completo (viene de 'protect')
         res.status(200).json(req.user);
     } catch (error) {
         res.status(500).send('Error al obtener perfil.');
     }
 });
-
-app.put('/api/profile', protect, async (req, res) => {
+app.put('/api/profile', protect, async (req, res) => { 
     try {
         const updates = req.body;
         delete updates.role;
         delete updates.email;
         delete updates.profileImage;
         delete updates.galleryImages;
-        
         const updatedUser = await User.findByIdAndUpdate(
             req.user.id, { $set: updates }, { new: true, runValidators: true }
         ).select('-password');
-
         if (!updatedUser) return res.status(404).send('Usuario no encontrado.');
         res.status(200).json(updatedUser);
     } catch (error) {
@@ -175,7 +165,6 @@ app.post('/api/profile/image', protect, upload.single('profileImage'), async (re
     try {
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).send('Usuario no encontrado.');
-
         if (user.profileImage && fs.existsSync(user.profileImage)) {
             fs.unlinkSync(user.profileImage);
         }
@@ -186,12 +175,10 @@ app.post('/api/profile/image', protect, upload.single('profileImage'), async (re
         res.status(500).send('Error al subir la imagen de perfil: ' + error.message);
     }
 });
-
 app.delete('/api/profile/image', protect, async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
         if (!user || !user.profileImage) return res.status(404).send('No hay imagen de perfil para eliminar.');
-
         if (fs.existsSync(user.profileImage)) {
             fs.unlinkSync(user.profileImage);
         }
@@ -211,7 +198,6 @@ app.post('/api/profile/gallery', protect, upload.array('galleryImages', 10), asy
     try {
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).send('Usuario no encontrado.');
-
         const newImageUrls = req.files.map(file => file.path.replace(/\\/g, "/"));
         user.galleryImages.push(...newImageUrls);
         await user.save();
@@ -220,18 +206,14 @@ app.post('/api/profile/gallery', protect, upload.array('galleryImages', 10), asy
         res.status(500).send('Error al subir imágenes: ' + error.message);
     }
 });
-
-app.delete('/api/profile/gallery', protect, async (req, res) => {
+app.delete('/api/profile/gallery', protect, async (req, res) => { 
     const { imageUrl } = req.body; 
     if (!imageUrl) return res.status(400).send('URL de imagen requerida.');
-    
     try {
         const user = await User.findById(req.user.id);
         if (!user) return res.status(404).send('Usuario no encontrado.');
-
         user.galleryImages = user.galleryImages.filter(img => img !== imageUrl);
         await user.save();
-        
         if (fs.existsSync(imageUrl)) {
             fs.unlinkSync(imageUrl);
         }
@@ -240,7 +222,6 @@ app.delete('/api/profile/gallery', protect, async (req, res) => {
         res.status(500).send('Error al eliminar imagen: ' + error.message);
     }
 });
-
 
 // --- API CRUD: Gestión de Productos ---
 app.post('/api/products', protect, isProducer, upload.single('imageFile'), async (req, res) => {
@@ -254,7 +235,6 @@ app.post('/api/products', protect, isProducer, upload.single('imageFile'), async
         res.status(500).send('Error al crear producto: ' + error.message);
     }
 });
-
 app.get('/api/products/my', protect, async (req, res) => {
     try {
         let products;
@@ -266,7 +246,6 @@ app.get('/api/products/my', protect, async (req, res) => {
         res.status(200).json(products);
     } catch (error) { res.status(500).send('Error al obtener productos.'); }
 });
-
 app.get('/api/products', async (req, res) => {
     try {
         const products = await Product.find({})
@@ -280,8 +259,7 @@ app.get('/api/products', async (req, res) => {
         res.status(500).send('Error al obtener productos.');
     }
 });
-
-app.get('/api/products/:id', async (req, res) => {
+app.get('/api/products/:id', async (req, res) => { 
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('ID inválido.');
     try {
         const product = await Product.findById(req.params.id);
@@ -289,8 +267,7 @@ app.get('/api/products/:id', async (req, res) => {
         res.status(200).json(product);
     } catch (error) { res.status(500).send('Error al obtener producto.'); }
 });
-
-app.put('/api/products/:id', protect, upload.single('imageFile'), async (req, res) => {
+app.put('/api/products/:id', protect, upload.single('imageFile'), async (req, res) => { 
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('ID inválido.');
     try {
         const product = await Product.findById(req.params.id);
@@ -306,22 +283,19 @@ app.put('/api/products/:id', protect, upload.single('imageFile'), async (req, re
         res.status(200).json(updatedProduct);
     } catch (error) { res.status(500).send('Error al actualizar producto.'); }
 });
-
-app.delete('/api/products/:id', protect, async (req, res) => {
+app.delete('/api/products/:id', protect, async (req, res) => { 
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('ID inválido.');
     try {
         const product = await Product.findById(req.params.id);
         if (!product) return res.status(404).send('Producto no encontrado.');
         if (product.owner.toString() !== req.user.id && req.user.role !== 'admin') return res.status(403).send('No autorizado.');
-        
         if (product.imageUrl && fs.existsSync(product.imageUrl)) fs.unlinkSync(product.imageUrl);
         await Product.findByIdAndDelete(req.params.id);
-        
         res.status(200).send('Producto eliminado.');
     } catch (error) { res.status(500).send('Error al eliminar producto.'); }
 });
 
-// --- API: Gestión de Ubicación ---
+// --- API: Gestión de Ubicación (PRODUCTOR) ---
 app.get('/api/locations', async (req, res) => { 
      try {
          const locations = await Location.find({}).populate('owner', 'producerNamePublic _id');
@@ -358,6 +332,55 @@ app.post('/api/locations', protect, isProducer, upload.single('imageFile'), asyn
      }
 });
 
+
+// --- NUEVO: API: Gestión de Ubicaciones (ADMIN) ---
+
+// GET Todas las ubicaciones (para el panel de admin)
+app.get('/api/admin/locations', protect, isAdmin, async (req, res) => {
+    try {
+        const locations = await Location.find({}).populate('owner', 'email');
+        res.status(200).json(locations);
+    } catch (error) {
+        res.status(500).send('Error al obtener ubicaciones de admin.');
+    }
+});
+
+// POST Crear una ubicación como Admin (sin dueño)
+app.post('/api/admin/locations', protect, isAdmin, upload.single('imageFile'), async (req, res) => {
+    const locationData = { ...req.body };
+    locationData.owner = undefined; 
+    
+    if (req.file) {
+        locationData.imageUrl = req.file.path.replace(/\\/g, "/");
+    }
+
+    try {
+        const newLocation = new Location(locationData);
+        await newLocation.save();
+        res.status(201).json(newLocation);
+    } catch (error) {
+        res.status(500).send('Error al crear ubicación: ' + error.message);
+    }
+});
+
+// DELETE Eliminar una ubicación (Admin)
+app.delete('/api/admin/locations/:id', protect, isAdmin, async (req, res) => {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('ID inválido.');
+    try {
+        const location = await Location.findByIdAndDelete(req.params.id);
+        if (!location) return res.status(404).send('Ubicación no encontrada.');
+        
+        // Borrar imagen si existe
+        if (location.imageUrl && fs.existsSync(location.imageUrl)) {
+            fs.unlinkSync(location.imageUrl);
+        }
+        res.status(200).send('Ubicación eliminada.');
+    } catch (error) {
+        res.status(500).send('Error al eliminar ubicación.');
+    }
+});
+
+
 // --- API: Gestión de Usuarios (Admin) ---
 app.get('/api/users', protect, isAdmin, async (req, res) => {
     try {
@@ -367,7 +390,7 @@ app.get('/api/users', protect, isAdmin, async (req, res) => {
         res.status(500).send('Error al obtener usuarios.');
     }
 });
-app.put('/api/users/:id/role', protect, isAdmin, async (req, res) => {
+app.put('/api/users/:id/role', protect, isAdmin, async (req, res) => { 
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('ID de usuario inválido.');
     try {
         const { role } = req.body;
@@ -397,7 +420,7 @@ app.delete('/api/users/:id', protect, isAdmin, async (req, res) => {
 });
 
 // --- API CRUD: Gestión de Posts (Admin) ---
-app.post('/api/posts', protect, isAdmin, upload.single('imageFile'), async (req, res) => {
+app.post('/api/posts', protect, isAdmin, upload.single('imageFile'), async (req, res) => { 
     const imageUrl = req.file ? req.file.path.replace(/\\/g, "/") : null;
     const { title, content } = req.body;
     if (!title || !content) {
@@ -414,7 +437,7 @@ app.post('/api/posts', protect, isAdmin, upload.single('imageFile'), async (req,
         res.status(500).send('Error al crear post: ' + error.message);
     }
 });
-app.put('/api/posts/:id', protect, isAdmin, upload.single('imageFile'), async (req, res) => {
+app.put('/api/posts/:id', protect, isAdmin, upload.single('imageFile'), async (req, res) => { 
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('ID inválido.');
     try {
         const updatedData = { ...req.body };
@@ -430,7 +453,7 @@ app.put('/api/posts/:id', protect, isAdmin, upload.single('imageFile'), async (r
         res.status(500).send('Error al actualizar post: ' + error.message);
     }
 });
-app.get('/api/posts/:id', async (req, res) => {
+app.get('/api/posts/:id', async (req, res) => { 
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('ID inválido.');
     try {
         const post = await Post.findById(req.params.id).populate('author', 'email producerNamePublic');
@@ -438,7 +461,7 @@ app.get('/api/posts/:id', async (req, res) => {
         res.status(200).json(post);
     } catch (error) { res.status(500).send('Error al obtener post.'); }
 });
-app.get('/api/posts', async (req, res) => {
+app.get('/api/posts', async (req, res) => { 
     try {
         const posts = await Post.find({}).populate('author', 'email producerNamePublic').sort({ createdAt: -1 });
         res.json(posts);
@@ -446,7 +469,7 @@ app.get('/api/posts', async (req, res) => {
         res.status(500).send('Error al obtener posts.');
     }
 });
-app.delete('/api/posts/:id', protect, isAdmin, async (req, res) => {
+app.delete('/api/posts/:id', protect, isAdmin, async (req, res) => { 
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).send('ID inválido.');
     try {
         const deletedPost = await Post.findByIdAndDelete(req.params.id);

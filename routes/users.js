@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User'); // Necesita el modelo de User
-const { verifyToken, isAdmin } = require('./auth'); // Necesita los middlewares
+const User = require('../models/User');
+const { verifyToken, isAdmin } = require('./auth');
 
 // =========================================================================
 //                             R U T A S  D E  U S U A R I O S (A D M I N)
@@ -18,8 +18,7 @@ router.get('/', verifyToken, isAdmin, async (req, res) => {
     }
 });
 
-// 2. PUT /api/users/:id/role (Opcional: Cambiar rol)
-// Implementación pendiente: El frontend necesita un formulario o botón para enviar este cambio.
+// 2. PUT /api/users/:id/role (Cambiar rol)
 router.put('/:id/role', verifyToken, isAdmin, async (req, res) => {
     try {
         const { role } = req.body;
@@ -43,8 +42,7 @@ router.put('/:id/role', verifyToken, isAdmin, async (req, res) => {
 });
 
 
-// 3. DELETE /api/users/:id (Opcional: Eliminar usuario)
-// Implementación pendiente
+// 3. DELETE /api/users/:id (Eliminar usuario)
 router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
     try {
         const user = await User.findByIdAndDelete(req.params.id);

@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const contactLinksContainer = document.getElementById('contact-links');
     const profileTitle = document.getElementById('profile-title');
     
-    // Referencias de Logo y Galería (ahora usando SimpleLightbox)
+    // Referencias de Logo y Galería
     const producerLogoElement = document.getElementById('producer-logo');
     const profileGalleryContainer = document.getElementById('profile-gallery-container');
     const galleryGrid = document.getElementById('gallery-grid');
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // --- 2. FUNCIÓN PARA CONSTRUIR LOS BOTONES DE CONTACTO (CON ICONOS) ---
+    // --- 2. FUNCIÓN PARA CONSTRUIR LOS BOTONES DE CONTACTO ---
     function buildContactLinks(contact, email) {
         let html = '';
         const name = producerNameElement.textContent || 'El productor';
@@ -62,15 +62,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        galleryGrid.innerHTML = ''; // Limpiar la cuadrícula
+        galleryGrid.innerHTML = '';
         images.forEach(imageUrl => {
-            const imgPath = `/${imageUrl}`; // Asegurarse de que la ruta sea correcta
+            const imgPath = `/${imageUrl}`;
             const galleryItemLink = document.createElement('a');
-            galleryItemLink.href = imgPath; // Enlace a la imagen grande
+            galleryItemLink.href = imgPath;
             galleryItemLink.className = 'gallery-item';
             
             const img = document.createElement('img');
-            img.src = imgPath; // Miniatura
+            img.src = imgPath;
             img.alt = 'Imagen de galería del productor';
             
             galleryItemLink.appendChild(img);
@@ -80,16 +80,13 @@ document.addEventListener('DOMContentLoaded', () => {
         profileGalleryContainer.style.display = 'block';
 
         // Inicializar SimpleLightbox después de que las imágenes se han cargado
-        // Asegúrate de que SimpleLightbox se inicialice en los enlaces correctos
         new SimpleLightbox('.gallery-grid a', {
-            // Opciones de SimpleLightbox (puedes ajustarlas)
-            captions: true, // Mostrar captions si hay
+            captions: true,
             captionDelay: 10,
             animationSpeed: 150,
             preloading: true,
             quitOnEsc: true,
             loop: true,
-            // Puedes añadir más opciones aquí
         });
     }
 
@@ -108,18 +105,17 @@ document.addEventListener('DOMContentLoaded', () => {
             profileTitle.textContent = `${name} | Perfil`;
             producerNameElement.textContent = name;
             producerBioElement.textContent = producer.bio || 'Este productor aún no ha escrito su biografía.';
-            
-            // Cargar el logo
+
             if (producer.profileImage) {
                 producerLogoElement.src = `/${producer.profileImage}`;
                 producerLogoElement.style.display = 'block';
             } else {
                 producerLogoElement.style.display = 'none';
-                producerNameElement.style.paddingTop = '0px'; // Quitar padding si no hay logo
+                producerNameElement.style.paddingTop = '0px';
             }
 
             buildContactLinks(producer.contact, producer.email);
-            buildGallery(producer.galleryImages); // Llamar a buildGallery en lugar de buildCarousel
+            buildGallery(producer.galleryImages);
 
         } catch (error) {
             console.error("Fallo al obtener el perfil del productor:", error);

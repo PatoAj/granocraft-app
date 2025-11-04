@@ -16,22 +16,22 @@
             z-index: 1000;
             left: 0; top: 0;
             width: 100%; height: 100%;
-            overflow-y: auto; /* Permitir scroll si el modal es muy alto */
+            overflow-y: auto;
             background-color: rgba(0,0,0,0.7);
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Alinea arriba */
-            padding-top: 5vh; /* Margen superior */
+            align-items: flex-start;
+            padding-top: 5vh;
         }
         .modal-content {
             background-color: #fefefe;
             padding: 30px;
             border-radius: 12px;
             width: 90%;
-            max-width: 800px; /* Tamaño legible */
+            max-width: 800px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
             position: relative;
-            margin-bottom: 5vh; /* Margen inferior */
+            margin-bottom: 5vh;
         }
         .close-button {
             color: #aaa;
@@ -51,15 +51,13 @@
             cursor: pointer;
         }
 
-        /* --- CORRECCIÓN PARA EL TEXTO --- */
         #modal-post-body {
             font-size: 1rem;
             line-height: 1.7;
             color: #333;
-            /* Estas 3 reglas arreglan el desbordamiento */
-            white-space: pre-wrap;   /* Respeta los saltos de línea */
-            overflow-wrap: break-word; /* Rompe palabras largas */
-            word-wrap: break-word;     /* (Fallback para navegadores antiguos) */
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
         }
     </style>
 </head>

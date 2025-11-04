@@ -23,24 +23,22 @@ const userSchema = new mongoose.Schema({
         trim: true,
         default: 'Productor Anónimo'
     },
-    bio: { // Pequeña descripción pública
+    bio: {
         type: String, 
         trim: true,
         default: ''
     },
-    contact: { // Datos dinámicos de contacto
+    contact: {
         whatsapp: { type: String, trim: true },
         instagram: { type: String, trim: true },
         facebook: { type: String, trim: true },
         showEmail: { type: Boolean, default: false }
     },
-    // ---  FOTO DE PERFIL/LOGO ---
     profileImage: { 
         type: String, 
         trim: true 
     },
     
-    // ---  GALERÍA (CARRUSEL) ---
     galleryImages: [{
         type: String,
         trim: true

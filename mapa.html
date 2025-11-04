@@ -4,17 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GranoCraft - Mapa</title>
-    <!-- CSS de Leaflet (requerido) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <!-- Tu CSS rediseñado -->
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Estilo para el contenedor del mapa (altura aumentada) */
         #mapaPublico {
-            height: 650px; /* <-- Aumentado de 500px a 650px */
+            height: 650px;
             width: 100%;
-            border-radius: 12px; /* Bordes redondeados */
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Sombra suave */
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             margin-top: 20px;
         }
         
@@ -22,11 +19,9 @@
         .leaflet-popup-content-wrapper {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
-
-        /* --- NUEVOS ESTILOS PARA EL DIRECTORIO --- */
         .locations-list {
             padding: 40px 20px;
-            max-width: 1100px; /* Mismo ancho que .mapa */
+            max-width: 1100px;
             margin: 0 auto;
             width: 90%;
         }
@@ -36,8 +31,8 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             padding: 20px;
             margin-bottom: 20px;
-            display: flex; /* Para imagen al lado del texto */
-            flex-wrap: wrap; /* Para responsive en móvil */
+            display: flex;
+            flex-wrap: wrap;
             gap: 20px;
             align-items: center;
         }
@@ -48,8 +43,8 @@
             border-radius: 8px;
         }
         .location-card-content {
-            flex: 1; /* Ocupa el espacio restante */
-            min-width: 250px; /* Para mejor wrapping */
+            flex: 1;
+            min-width: 250px;
         }
         .location-card-content h3 {
             font-size: 1.4em;
@@ -62,7 +57,6 @@
             color: #555;
             font-size: 0.95em;
         }
-        /* --- FIN NUEVOS ESTILOS --- */
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -89,13 +83,12 @@
         <h1>Mapa de Productores y Cafeterías</h1>
         <p style="text-align: center; max-width: 600px; margin: 0 auto;">Explora las fincas y cafeterías de especialidad registradas en nuestra plataforma. Haz clic en un pin para ver los detalles.</p>
         
-        <!-- Contenedor donde se cargará el mapa -->
         <div id="mapaPublico">
             <p style="text-align: center; padding-top: 50px;">Cargando mapa...</p>
         </div>
     </section>
 
-    <!-- --- NUEVA SECCIÓN: Directorio de Ubicaciones --- -->
+    <!-- --- Directorio de Ubicaciones --- -->
     <section class="locations-list">
         <h2 style="font-size: 2.2em; margin-bottom: 30px; color: #3C2A21; text-align: center;">Directorio de Fincas y Cafeterías</h2>
         
@@ -104,14 +97,12 @@
             <p style="text-align: center;">Cargando directorio...</p>
         </div>
     </section>
-    <!-- --- FIN NUEVA SECCIÓN --- -->
 
 
     <footer>
         <p>© 2025 GranoCraft - ® HiuPat. Todos los derechos reservados.</p>
     </footer>
 
-    <!-- Scripts (requeridos al final) -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script> <!-- JS de Leaflet -->
     <script src="js/main.js"></script> <!-- Para la navegación dinámica (login/logout) -->
     <script src="js/map.js"></script> <!-- Carga las ubicaciones de la API -->

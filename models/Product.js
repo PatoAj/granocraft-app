@@ -11,7 +11,7 @@ const productSchema = new mongoose.Schema({
         trim: true,
         default: 'https://via.placeholder.com/200/cccccc/000000?text=NoImage'
     },
-    // --- FIN CAMBIO ---
+    
     origin: { type: String, required: true },
     producerName: { type: String, required: false, trim: true, default: 'Productor no especificado' },
     roastLevel: { type: String, enum: ['Claro', 'Medio', 'Oscuro'], default: 'Medio' },

@@ -1,11 +1,13 @@
+// GranoCraft/models/Location.js
+
 const mongoose = require('mongoose');
 
 const locationSchema = new mongoose.Schema({
     owner: {
         type: mongoose.Schema.Types.ObjectId,
-        required: true,
         ref: 'User',
-        unique: true
+        required: false,
+        unique: false
     },
     locationName: { 
         type: String,
@@ -39,7 +41,6 @@ const locationSchema = new mongoose.Schema({
         type: String,
         required: false, 
         trim: true
-        // default quitado para que Multer lo llene
     }
 }, {
     timestamps: true

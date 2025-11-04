@@ -7,22 +7,20 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
     <link rel="stylesheet" href="css/style.css">
     
     <style>
-        /* Estilos en línea para asegurar que Tailwind y CSS base funcionen */
         .content-area { background-color: #ffffff; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 1.5rem; }
         .sidebar-link { display: block; padding: 0.75rem 1rem; margin-bottom: 0.5rem; border-radius: 0.375rem; color: #3C2A21; transition: background-color 0.2s ease; cursor: pointer; }
         .sidebar-link:hover { background-color: #f3f4f6; }
         .sidebar-link.active { background-color: #A18A76; color: white; font-weight: 600; }
         .admin-section { display: none; }
         .admin-section.active { display: block; }
-        #locationMap { height: 300px; width: 100%; border-radius: 0.375rem; border: 1px solid #d1d5db; margin-bottom: 1rem; }
-        .modal { display: none; /* Oculto por defecto */ }
-        .modal.active { display: flex; align-items: flex-start; justify-content: center; padding-top: 5vh; } /* Alineado arriba para scroll */
+        #locationMap, #adminLocationMap { height: 300px; width: 100%; border-radius: 0.375rem; border: 1px solid #d1d5db; margin-bottom: 1rem; }
+        .modal { display: none; }
+        .modal.active { display: flex; align-items: flex-start; justify-content: center; padding-top: 5vh; z-index: 50; position: fixed; inset: 0; }
         .modal-content-wrapper { max-height: 90vh; overflow-y: auto; }
-        #imagePreview, #editImagePreview, #locationImagePreview, #blogImagePreview, #editPostImagePreview { max-height: 100px; margin-top: 5px; border-radius: 4px; border: 1px solid #ccc; display: none; object-fit: cover; }
+        #imagePreview, #editImagePreview, #locationImagePreview, #blogImagePreview, #editPostImagePreview, #currentProfileImage, #adminLocationImagePreview { max-height: 100px; margin-top: 5px; border-radius: 4px; border: 1px solid #ccc; display: none; object-fit: cover; }
         .table-actions button { margin-right: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.875rem; border-radius: 0.25rem; border: none; cursor: pointer; }
         .delete-btn { background-color: #e53e3e; color: white; } .delete-btn:hover { background-color: #c53030; }
         .edit-btn { background-color: #a0aec0; color: white; } .edit-btn:hover { background-color: #718096; }
@@ -37,6 +35,10 @@
         .file-input-button input[type="file"]::file-selector-button { margin-right: 1rem; padding: 0.5rem 1rem; border-radius: 0.375rem; border-width: 0; font-size: 0.875rem; font-weight: 600; background-color: #A18A76; color: white; cursor: pointer; transition: background-color 0.15s ease-in-out; }
          .file-input-button input[type="file"]::file-selector-button:hover { background-color: #8B7763; }
          .file-input-button input[type="file"] { color: #6b7280; }
+        #currentGallery .gallery-item { position: relative; width: 100%; padding-bottom: 100%; overflow: hidden; border-radius: 8px; }
+        #currentGallery .gallery-item img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
+        #currentGallery .delete-gallery-image-btn { position: absolute; top: 4px; right: 4px; background-color: rgba(229, 62, 62, 0.8); color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; opacity: 0; transition: opacity 0.2s; }
+        #currentGallery .gallery-item:hover .delete-gallery-image-btn { opacity: 1; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen bg-[#E8D9C5]">
@@ -58,6 +60,7 @@
                  <a href="#" class="sidebar-link active" data-section="profileSection" id="profileLink"><i class="fa-solid fa-user-gear fa-fw mr-2"></i>Mi Perfil</a>
                  <a href="#" class="sidebar-link" data-section="productsSection" id="productsLink" style="display: none;"><i class="fa-solid fa-boxes-stacked fa-fw mr-2"></i>Mis Productos</a>
                  <a href="#" class="sidebar-link" data-section="locationSection" id="locationLink" style="display: none;"><i class="fa-solid fa-location-dot fa-fw mr-2"></i>Mi Ubicación</a>
+                 <a href="#" class="sidebar-link" data-section="manageLocationsAdminSection" id="manageLocationsAdminLink" style="display: none;"><i class="fa-solid fa-map-marked-alt fa-fw mr-2"></i>Gestionar Ubicaciones</a>
                  <a href="#" class="sidebar-link" data-section="manageBlogSection" id="manageBlogLink" style="display: none;"><i class="fa-solid fa-pen-to-square fa-fw mr-2"></i>Gestionar Blog</a>
                  <a href="#" class="sidebar-link" data-section="manageUsersSection" id="manageUsersLink" style="display: none;"><i class="fa-solid fa-users fa-fw mr-2"></i>Gestionar Usuarios</a>
              </nav>
@@ -67,6 +70,7 @@
         </aside>
 
         <main class="flex-1 p-6 overflow-y-auto">
+            
             <div id="profileSection" class="admin-section active content-area">
                  <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Mi Perfil y Contacto Público</h2>
                  <form id="profileForm" class="max-w-4xl mx-auto">
@@ -118,7 +122,7 @@
                          
                          <div class="mt-4 relative w-36 h-36">
                              <img id="currentProfileImage" src="#" alt="Logo actual" class="rounded-full border border-gray-300 shadow-sm" style="width: 150px; height: 150px; object-fit: cover; display: none;">
-                             <button type="button" id="deleteProfileImageBtn" class="absolute top-0 right-0 px-2 py-1 bg-red-600 text-white text-xs rounded-full hover:bg-red-700" style="display: none; font-size: 10px; line-height: 1;">
+                             <button type="button" id="deleteProfileImageBtn" class="absolute top-0 right-0 p-1 bg-red-600 text-white text-xs rounded-full hover:bg-red-700" style="display: none; font-size: 10px; line-height: 1; width: 24px; height: 24px;">
                                  <i class="fa-solid fa-trash"></i>
                              </button>
                          </div>
@@ -127,6 +131,7 @@
                          <button type="submit" class="form-button form-button-primary px-6">Guardar Logo</button>
                      </div>
                  </form>
+
                  <hr class="my-8 border-gray-300">
                  <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Galería de Imágenes (Carrusel)</h3>
                  <form id="galleryUploadForm" class="max-w-4xl mx-auto">
@@ -139,12 +144,11 @@
                          <button type="submit" class="form-button form-button-primary px-6">Añadir Imágenes a Galería</button>
                      </div>
                  </form>
-
                  <h4 class="text-lg font-medium mt-6 mb-2 text-[#3C2A21]">Galería Actual:</h4>
                  <div id="currentGallery" class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
                      <p>Cargando galería...</p>
                  </div>
-                 </div>
+            </div>
 
             <div id="productsSection" class="admin-section content-area">
                  <div class="flex justify-between items-center mb-4">
@@ -191,44 +195,69 @@
 
             <div id="locationSection" class="admin-section content-area">
                 <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Mi Ubicación en el Mapa</h2>
-                <p class="mb-4 text-gray-600">Actualiza los datos de tu finca o cafetería. Haz clic en el mapa para establecer tu ubicación.</p>
                 <form id="locationForm" class="max-w-4xl mx-auto">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label for="locationName" class="form-label">Nombre de la Finca/Café:</label>
-                            <input type="text" id="locationName" name="locationName" required class="form-input">
-                        </div>
-                        <div>
-                            <label for="address" class="form-label">Dirección:</label>
-                            <input type="text" id="address" name="address" required class="form-input">
-                        </div>
-                    </div>
-                    <label class="form-label">Ubicación en el Mapa:</label>
                     <div id="locationMap"></div>
-                    <p class="text-xs text-gray-500 mt-1 mb-4">Haz clic en el mapa para colocar el marcador.</p>
-                    <input type="hidden" id="locationLatitude" name="latitude">
-                    <input type="hidden" id="locationLongitude" name="longitude">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="schedule" class="form-label">Horario (Opcional):</label>
-                            <input type="text" id="schedule" name="schedule" class="form-input" placeholder="Ej: L-S: 8am - 6pm">
-                        </div>
-                        <div>
-                            <label for="specialty" class="form-label">Especialidad (Opcional):</label>
-                            <input type="text" id="specialty" name="specialty" class="form-input" placeholder="Ej: V60, Chemex">
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <label for="locationImageFile" class="form-label">Cargar Imagen (Opcional):</label>
-                        <input type="file" id="locationImageFile" name="imageFile" accept="image/*" class="w-full text-sm text-gray-500 file-input-button">
-                        <img id="locationImagePreview" src="#" alt="Vista previa de ubicación" class="mt-2"/>
-                    </div>
                     <div class="flex justify-end mt-6">
-                        <button type="submit" class="form-button form-button-primary px-6">Guardar Ubicación</button>
+                         <button type="submit" class="form-button form-button-primary px-6">Guardar Ubicación</button>
                     </div>
                 </form>
             </div>
 
+            <div id="manageLocationsAdminSection" class="admin-section content-area">
+                <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Gestionar Todas las Ubicaciones (Admin)</h2>
+                
+                <form id="adminLocationForm" class="mb-8 p-6 border rounded-lg bg-gray-50 max-w-4xl mx-auto">
+                    <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Añadir Nueva Ubicación (Pública)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="adminLocationName" class="form-label">Nombre Finca/Café:</label>
+                            <input type="text" id="adminLocationName" name="locationName" required class="form-input">
+                        </div>
+                        <div>
+                            <label for="adminAddress" class="form-label">Dirección:</label>
+                            <input type="text" id="adminAddress" name="address" required class="form-input">
+                        </div>
+                    </div>
+                    <label class="form-label">Ubicación en el Mapa:</label>
+                    <div id="adminLocationMap"></div> <p class="text-xs text-gray-500 mt-1 mb-4">Haz clic en el mapa para colocar el marcador.</p>
+                    <input type="hidden" id="adminLocationLatitude" name="latitude">
+                    <input type="hidden" id="adminLocationLongitude" name="longitude">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="adminSchedule" class="form-label">Horario:</label>
+                            <input type="text" id="adminSchedule" name="schedule" class="form-input" placeholder="Ej: L-S: 8am - 6pm">
+                        </div>
+                        <div>
+                            <label for="adminSpecialty" class="form-label">Especialidad:</label>
+                            <input type="text" id="adminSpecialty" name="specialty" class="form-input" placeholder="Ej: V60, Chemex">
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label for="adminLocationImageFile" class="form-label">Cargar Imagen (Opcional):</label>
+                        <input type="file" id="adminLocationImageFile" name="imageFile" accept="image/*" class="w-full text-sm text-gray-500 file-input-button">
+                        <img id="adminLocationImagePreview" src="#" alt="Vista previa" class="mt-2"/>
+                    </div>
+                    <div class="flex justify-end mt-6">
+                        <button type="submit" class="form-button form-button-primary px-6">Guardar Ubicación (Admin)</button>
+                    </div>
+                </form>
+
+                <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Ubicaciones Registradas</h3>
+                <div class="overflow-x-auto">
+                     <table class="w-full text-sm text-left text-gray-500">
+                         <thead class="text-xs text-[#3C2A21] uppercase bg-gray-100">
+                             <tr>
+                                 <th class="px-6 py-3">Nombre</th>
+                                 <th class="px-6 py-3">Dirección</th>
+                                 <th class="px-6 py-3">Dueño (Productor)</th>
+                                 <th class="px-6 py-3">Acciones</th>
+                             </tr>
+                         </thead>
+                         <tbody id="locations-admin-tbody">
+                             </tbody>
+                     </table>
+                 </div>
+            </div>
             <div id="manageBlogSection" class="admin-section content-area">
                  <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Gestionar Blog</h2>
                  <form id="addPostForm" class="mb-8 p-6 border rounded-lg bg-gray-50 max-w-4xl mx-auto">
@@ -298,7 +327,7 @@
                                  <div><label for="editPrice" class="form-label">Precio:</label><input type="number" id="editPrice" name="price" step="0.01" required class="form-input"></div>
                                  <div><label for="editOrigin" class="form-label">Origen:</label><input type="text" id="editOrigin" name="origin" required class="form-input"></div>
                                  <div><label for="editProducerName" class="form-label">Productor:</label><input type="text" id="editProducerName" name="producerName" class="form-input"></div>
-                                 <div><label for="editRoastLevel" class="form-label">Tueste:</label><select id="editRoastLevel" name="roastLevel" class="form-input"><option value="Claro">Claro</option><option value="Medio">Medio</option><option value-="Oscuro">Oscuro</option></select></div>
+                                 <div><label for="editRoastLevel" class="form-label">Tueste:</label><select id="editRoastLevel" name="roastLevel" class="form-input"><option value="Claro">Claro</option><option value="Medio">Medio</option><option value="Oscuro">Oscuro</option></select></div>
                                  <div><label for="editStock" class="form-label">Stock:</label><input type="number" id="editStock" name="stock" class="form-input"></div>
                              </div>
                              <div class="mt-4"><label for="editDescription" class="form-label">Descripción:</label><textarea id="editDescription" name="description" rows="4" required class="form-input"></textarea></div>

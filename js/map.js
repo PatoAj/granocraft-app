@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ? `/${location.imageUrl}` 
             : 'https://via.placeholder.com/300x150/A18A76/FFFFFF?text=Sin+Imagen';
 
-        // Usamos el nombre del productor (si está populado) para mayor claridad
+        // Usamos el nombre del productor para mayor claridad
         const producerName = location.owner ? location.owner.producerNamePublic : 'N/A';
 
         return `
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Generar todas las tarjetas y mostrarlas
             locationsListContainer.innerHTML = locations.map(createLocationCard).join('');
 
-            // Opcional: Centrar el mapa si hay ubicaciones
+            // Centrar el mapa si hay ubicaciones
             if (locations[0] && locations[0].latitude) {
                  map.setView([locations[0].latitude, locations[0].longitude], 10);
             }
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         locationsListContainer.innerHTML = '<p style="text-align: center;">Cargando directorio...</p>';
 
         try {
-            // Llamar a la API pública (Asumiendo que POPULA el dueño en el backend)
+            // Llamar a la API pública
             const response = await fetch('/api/locations');
             if (!response.ok) {
                 throw new Error(`Error al cargar ubicaciones: ${response.status}`);
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Filtrar solo ubicaciones con latitud/longitud válidas para el mapa
             const validLocations = locations.filter(loc => loc.latitude && loc.longitude);
             
-            // Llenar el Directorio (lista de tarjetas)
+            // Llenar el Directorio
             displayLocationsList(validLocations);
 
             // Crear un marcador (pin) por cada ubicación

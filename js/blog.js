@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const formatDate = (d) => new Date(d).toLocaleDateString('es-GT', { year: 'numeric', month: 'long', day: 'numeric' });
 
-    // --- FUNCIÓN DE TARJETA ACTUALIZADA ---
+    // --- FUNCIÓN DE TARJETA ---
     function createPostCard(post) {
         let imageUrl = post.imageUrl 
             ? `/${post.imageUrl}` 
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const excerpt = post.content.substring(0, 150) + (post.content.length > 150 ? '...' : '');
 
-        // CAMBIO AQUÍ: Usar el nombre público del autor
+        // Usar el nombre público del autor
         const authorName = post.author ? (post.author.producerNamePublic || post.author.email) : 'Administrador';
 
         return `
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
-    // --- FUNCIÓN DEL MODAL ACTUALIZADA ---
+    // --- FUNCIÓN DEL MODAL ---
     async function loadFullPost(postId) {
         try {
             const response = await fetch(`/api/posts/${postId}`);
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const imageUrl = post.imageUrl ? `/${post.imageUrl}` : '';
             
-            // CAMBIO AQUÍ: Usar el nombre público del autor
+            // Usar el nombre público del autor
             const authorName = post.author ? (post.author.producerNamePublic || post.author.email) : 'Administrador';
 
             modalTitle.textContent = post.title;
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 modalImage.style.display = 'none';
             }
             
-            modalBody.textContent = post.content; // textContent preserva saltos de línea y es seguro
+            modalBody.textContent = post.content;
             
             fullPostModal.style.display = 'flex'; 
             document.body.style.overflow = 'hidden'; 
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // --- FUNCIÓN PRINCIPAL (Sin cambios, pero la incluyo) ---
+    // --- FUNCIÓN PRINCIPAL ---
     async function fetchPosts() {
         postsGrid.innerHTML = '<p style="text-align: center; width: 100%;">Cargando entradas del blog...</p>';
         try {
@@ -90,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             postsGrid.innerHTML = posts.map(createPostCard).join('');
 
-            // Agregar listener a cada tarjeta/botón para abrir el modal
             postsGrid.querySelectorAll('.post-card').forEach(element => {
                 element.addEventListener('click', (e) => {
                     const postId = e.currentTarget.getAttribute('data-id');
@@ -109,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (closeModalBtn) {
         closeModalBtn.addEventListener('click', () => {
             fullPostModal.style.display = 'none';
-            document.body.style.overflow = ''; // Restaurar el scroll
+            document.body.style.overflow = '';
         });
     }
 

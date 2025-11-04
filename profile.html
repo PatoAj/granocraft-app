@@ -14,7 +14,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplelightbox/2.14.2/simple-lightbox.min.css">
 
     <style>
-        /* Estilos específicos para la tarjeta de perfil */
         .profile-card {
             max-width: 800px;
             margin: 40px auto;
@@ -22,9 +21,9 @@
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             padding: 40px;
-            padding-top: 80px; /* Espacio para el logo superpuesto */
+            padding-top: 80px;
             text-align: center;
-            position: relative; /* Para el logo */
+            position: relative;
         }
         .profile-card h1 {
             color: #3C2A21;
@@ -37,8 +36,6 @@
             margin-bottom: 30px;
             line-height: 1.6;
         }
-        
-        /* ESTILOS DE BOTONES DE CONTACTO */
         .contact-links a {
             display: inline-flex;
             align-items: center;
@@ -49,10 +46,10 @@
             font-weight: bold;
             text-decoration: none;
             transition: background-color 0.2s;
-            color: white; /* Color de texto blanco */
+            color: white;
         }
         .contact-links a i {
-            margin-right: 8px; /* Espacio entre icono y texto */
+            margin-right: 8px;
         }
         .whatsapp { background-color: #25D366; }
         .whatsapp:hover { background-color: #128C7E; }
@@ -63,22 +60,21 @@
         .email-link { background-color: #3C2A21; }
         .email-link:hover { background-color: #2D1F17; }
         
-        /* Estilos para la galería con Lightbox */
         .gallery-container {
             margin-top: 30px;
             margin-bottom: 40px;
-            text-align: center; /* Centrar el título de galería */
+            text-align: center;
         }
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* 2 a 4 columnas responsivas */
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 15px;
-            max-width: 700px; /* Ancho máximo para el grid */
-            margin: 20px auto; /* Centrar el grid */
+            max-width: 700px;
+            margin: 20px auto;
         }
         .gallery-item {
             width: 100%;
-            padding-bottom: 100%; /* Proporción cuadrada para los thumbnails */
+            padding-bottom: 100%;
             position: relative;
             overflow: hidden;
             border-radius: 8px;
@@ -95,14 +91,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Recortar si es necesario para llenar el cuadrado */
+            object-fit: cover;
             border-radius: 8px;
         }
-
-        /* Responsive adjustments */
         @media (max-width: 640px) {
             .gallery-grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Más pequeñas en móvil */
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
                 gap: 10px;
             }
         }

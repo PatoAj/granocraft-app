@@ -7,7 +7,7 @@
  */
 function showToast(message, type = 'success') {
     const container = document.getElementById('toast-container');
-    if (!container) return alert(message); // Fallback si el HTML no existe
+    if (!container) return alert(message);
 
     // 1. Crear el elemento toast
     const toast = document.createElement('div');
@@ -19,11 +19,10 @@ function showToast(message, type = 'success') {
 
     // 3. Eliminar el elemento del DOM después de que la animación termine (3.5s)
     setTimeout(() => {
-        // Asegurarse de que el toast todavía exista antes de intentar removerlo
         if (toast.parentElement === container) {
             container.removeChild(toast);
         }
-    }, 3500); // La animación dura 3s + 0.5s de salida
+    }, 3500);
 }
 
 
@@ -75,7 +74,6 @@ function updateNavBasedOnAuth() {
     }
 }
 
-// Ejecutar al cargar
 setActiveNav();
 updateNavBasedOnAuth();
 
@@ -100,7 +98,7 @@ if (document.getElementById('loginForm')) {
 
     // B. Envío del formulario de login
     if (loginForm && emailInput && passwordInput) {
-        localStorage.removeItem('authToken'); // Limpiar al cargar login
+        localStorage.removeItem('authToken');
 
         loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
