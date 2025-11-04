@@ -11,9 +11,12 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplelightbox/2.14.2/simple-lightbox.min.css">
 
     <style>
+        /* Estilos específicos para la tarjeta de perfil */
         .profile-card {
             max-width: 800px;
             margin: 40px auto;
@@ -21,9 +24,9 @@
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             padding: 40px;
-            padding-top: 80px;
+            padding-top: 80px; /* Espacio para el logo superpuesto */
             text-align: center;
-            position: relative;
+            position: relative; /* Para el logo */
         }
         .profile-card h1 {
             color: #3C2A21;
@@ -36,6 +39,8 @@
             margin-bottom: 30px;
             line-height: 1.6;
         }
+        
+        /* ESTILOS DE BOTONES DE CONTACTO */
         .contact-links a {
             display: inline-flex;
             align-items: center;
@@ -46,10 +51,10 @@
             font-weight: bold;
             text-decoration: none;
             transition: background-color 0.2s;
-            color: white;
+            color: white; /* Color de texto blanco */
         }
         .contact-links a i {
-            margin-right: 8px;
+            margin-right: 8px; /* Espacio entre icono y texto */
         }
         .whatsapp { background-color: #25D366; }
         .whatsapp:hover { background-color: #128C7E; }
@@ -57,52 +62,57 @@
         .instagram:hover { background-color: #833AB4; }
         .facebook { background-color: #1877F2; }
         .facebook:hover { background-color: #0E5CBE; }
-        .email-link { background-color: #3C2A21; }
+        /* Color corregido para "Enviar Correo" */
+        .email-link { background-color: #3C2A21; } 
         .email-link:hover { background-color: #2D1F17; }
         
-        .gallery-container {
+        /* Estilos para el carrusel */
+        .swiper-container {
+            width: 100%;
+            height: 400px;
             margin-top: 30px;
             margin-bottom: 40px;
-            text-align: center;
-        }
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            max-width: 700px;
-            margin: 20px auto;
-        }
-        .gallery-item {
-            width: 100%;
-            padding-bottom: 100%;
-            position: relative;
+            border-radius: 12px;
             overflow: hidden;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: transform 0.2s ease-in-out;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        .gallery-item:hover {
-            transform: translateY(-5px);
-        }
-        .gallery-item img {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .swiper-slide {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            border-radius: 8px;
         }
-        @media (max-width: 640px) {
-            .gallery-grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-                gap: 10px;
-            }
+        .swiper-slide a { /* El enlace <a> debe llenar el slide */
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .swiper-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Recortar la imagen para que llene el slide */
+            cursor: zoom-in; /* Indicar que se puede hacer clic */
+        }
+        .swiper-button-next, .swiper-button-prev {
+            color: white;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+        .swiper-button-next:hover, .swiper-button-prev:hover {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .swiper-button-next::after, .swiper-button-prev::after {
+            font-size: 20px !important;
+        }
+        .swiper-pagination-bullet-active {
+            background-color: #3C2A21 !important;
         }
     </style>
 </head>
 <body class="bg-[#F5F0E8]">
+    
     <div id="toast-container" class="toast-container"></div>
 
     <header>
@@ -127,13 +137,14 @@
              style="width: 150px; height: 150px; object-fit: cover; display: none; 
                     position: absolute; top: -75px; left: 50%; transform: translateX(-50%);">
 
-        <h1 id="producer-name" class="pt-12">Cargando Perfil...</h1>
-        <p class="bio" id="producer-bio"></p>
+        <h1 id="producer-name" class="pt-12">Cargando Perfil...</h1> <p class="bio" id="producer-bio"></p>
         
-        <div class="gallery-container" id="profile-gallery-container" style="display: none;">
-            <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Galería de Imágenes</h2>
-            <div class="gallery-grid" id="gallery-grid">
+        <div class="swiper-container" id="profile-gallery-carousel" style="display: none;">
+            <div class="swiper-wrapper gallery-lightbox" id="gallery-swiper-wrapper">
                 </div>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
         </div>
         
         <h2 style="font-size: 1.5rem; margin-top: 40px; margin-bottom: 20px; color: #3C2A21;">Contacto</h2>
@@ -146,7 +157,9 @@
         <p>© 2025 GranoCraft - ® HiuPat. Todos los derechos reservados.</p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simplelightbox/2.14.2/simple-lightbox.min.js"></script>
+    
     <script src="js/main.js"></script>
     <script src="js/producer_profile.js"></script>
 </body>

@@ -26,7 +26,6 @@ nav a:hover, #logout-button-nav:hover { color: #8a5a44; }
 nav a.active { border-bottom: 2px solid #3C2A21; padding-bottom: 3px; font-weight: bold; }
 #logout-button-nav { background: none; border: none; color: #3C2A21; cursor: pointer; font-size: 1em; font-weight: 500; margin-left: 10px; }
 
-
 footer {
     text-align: center;
     padding: 20px;
@@ -56,15 +55,14 @@ footer {
 .about h2, .galeria h2 { text-align: center; font-size: 2.2em; margin-bottom: 30px; color: #3C2A21; }
 .productos h1, .mapa h1 { text-align: center; font-size: 2.5em; margin-bottom: 40px; }
 
-
-/* --- GRID Y CARD (Productos/Blog/Galería - Con fondo cálido) --- */
+/* --- GRID Y CARD (Productos/Blog/Galería) --- */
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 30px;
 }
 .card {
-    background: #FAF6F0;
+    background: #FAF6F0; 
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     overflow: hidden;
@@ -77,17 +75,14 @@ footer {
 .card h3 { font-size: 1.3em; color: #3C2A21; margin: 15px 20px 10px 20px; }
 .card p { font-size: 0.95em; color: #555; padding: 0 20px; line-height: 1.6; flex-grow: 1; margin-bottom: 15px; }
 .card .price { font-size: 1.2em; font-weight: bold; color: #3C2A21; margin: 0 20px 15px 20px; text-align: right; }
-.card p strong { color: #8a5a44;}
-
-/* Estilos específicos para tarjeta de blog */
+.card p strong { color: #8a5a44; }
 .card .card-content { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
 .card .card-content .date { font-size: 0.85em; color: #8a5a44; margin-bottom: 10px; }
-
 
 /* --- ESTILOS LOGIN Y REGISTRO (Cálidos) --- */
 .auth-container { display: flex; align-items: center; justify-content: center; padding: 40px 20px; flex-grow: 1; }
 .auth-card {
-    background: #FAF6F0;
+    background: #FAF6F0; 
     padding: 40px;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
@@ -101,10 +96,10 @@ footer {
 .auth-card form { text-align: left; }
 .auth-card label { display: block; margin-bottom: 8px; font-weight: 600; color: #3C2A21; }
 .auth-card .form-input {
-    width: 100%; padding: 12px; border: 1px solid #D1C7B8;
+    width: 100%; padding: 12px; border: 1px solid #D1C7B8; 
     border-radius: 8px; box-sizing: border-box; margin-bottom: 20px;
-    background-color: #fff;
-
+    background-color: #fff; 
+}
 .auth-card .form-input:focus {
     border-color: #8a5a44; 
     outline: none; box-shadow: 0 0 0 3px rgba(138, 90, 68, 0.3);
@@ -112,22 +107,24 @@ footer {
 .auth-card .password-wrapper { position: relative; width: 100%; }
 .auth-card .password-wrapper input { width: 100%; }
 .auth-card #togglePassword { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #888; }
-.auth-card .form-button {
+/* ESTILOS DE BOTÓN CORREGIDOS (para login/register) */
+.form-button {
     width: 100%; padding: 14px; border: none; border-radius: 8px;
-    background: #8a5a44;
-    color: white; font-size: 1em; font-weight: 600; cursor: pointer; transition: background-color 0.2s ease;
+    background: #8a5a44; /* Tono terracota/canela */
+    color: white; font-size: 1em; font-weight: 600; cursor: pointer; 
+    transition: background-color 0.2s ease;
 }
-.auth-card .form-button:hover {
-    background: #6B4F4B;
+.form-button:hover {
+    background: #6B4F4B; /* Marrón más oscuro */
 }
 .auth-card .auth-links { margin-top: 25px; text-align: center; }
 .auth-card .auth-links a {
-    color: #8a5a44;
+    color: #8a5a44; 
     text-decoration: none; margin: 0 10px; font-weight: 500;
 }
 .auth-card .auth-links a:hover { text-decoration: underline; }
 
-/* --- Media Query Responsive (Ajustes Adicionales) --- */
+/* --- Media Query Responsive --- */
 @media (max-width: 768px) {
     header { flex-direction: column; padding: 10px; }
     nav { margin-top: 10px; display: flex; flex-wrap: wrap; justify-content: center; }
@@ -136,21 +133,17 @@ footer {
     .hero p { font-size: 1em; }
     .about, .productos, .mapa, .galeria { padding: 30px 15px; }
     .productos h1, .mapa h1, .about h2, .galeria h2 { font-size: 1.8em; margin-bottom: 25px; }
-    .auth-card { padding: 30px; }
+    .auth-card { padding: 30px; } 
 }
 
 /* --- ESTILOS DE NOTIFICACIÓN TOAST (Top-Left) --- */
-
-/* Contenedor principal de las notificaciones */
 .toast-container {
     position: fixed;
     top: 20px;
     left: 20px;
-    z-index: 9999;
+    z-index: 9999; 
     width: 320px; 
 }
-
-/* Estilo de cada notificación individual */
 .toast {
     background-color: #ffffff;
     color: #333;
@@ -163,41 +156,20 @@ footer {
     line-height: 1.4;
     display: flex;
     align-items: center;
-    opacity: 0;
-
+    opacity: 0; 
     animation: slideInLeft 0.4s ease forwards, slideOutLeft 0.4s ease 3s forwards;
 }
-
-/* Colores de borde para éxito y error */
 .toast-success {
-    border-left: 5px solid #4CAF50;
+    border-left: 5px solid #4CAF50; /* Verde */
 }
-
 .toast-error {
-    border-left: 5px solid #e53e3e;
+    border-left: 5px solid #e53e3e; /* Rojo */
 }
-
-/* Animación de entrada */
 @keyframes slideInLeft {
-    from {
-        transform: translateX(-120%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+    from { transform: translateX(-120%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
 }
-
-/* Animación de salida (después de 3 segundos) */
 @keyframes slideOutLeft {
-    from {
-        transform: translateX(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateX(-120%);
-        opacity: 0;
-        margin-top: -50px;
-    }
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(-120%); opacity: 0; margin-top: -50px; }
 }

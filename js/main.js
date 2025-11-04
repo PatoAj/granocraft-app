@@ -7,7 +7,7 @@
  */
 function showToast(message, type = 'success') {
     const container = document.getElementById('toast-container');
-    if (!container) return alert(message);
+    if (!container) return alert(message); // Fallback si el HTML no existe
 
     // 1. Crear el elemento toast
     const toast = document.createElement('div');
@@ -19,10 +19,11 @@ function showToast(message, type = 'success') {
 
     // 3. Eliminar el elemento del DOM después de que la animación termine (3.5s)
     setTimeout(() => {
+        // Asegurarse de que el toast todavía exista antes de intentar removerlo
         if (toast.parentElement === container) {
             container.removeChild(toast);
         }
-    }, 3500);
+    }, 3500); // La animación dura 3s + 0.5s de salida
 }
 
 
@@ -35,8 +36,20 @@ function setActiveNav() {
     const currentPath = window.location.pathname.split('/').pop() || 'index.html';
     if (currentPath) {
         try {
-            const activeLink = document.querySelector(`nav a[href="${currentPath}"]`);
-            if (activeLink) activeLink.classList.add('active');
+            // Buscar un enlace que coincida exactamente
+            let activeLink = document.querySelector(`nav a[href="${currentPath}"]`);
+            
+            // Si no se encuentra y estamos en la raíz, activar 'index.html'
+            if (!activeLink && (currentPath === '' || currentPath.startsWith('index.html'))) {
+                 activeLink = document.querySelector('nav a[href="index.html"]');
+            }
+            
+            if (activeLink) {
+                // Quitar 'active' de todos
+                document.querySelectorAll('nav a').forEach(link => link.classList.remove('active'));
+                // Añadir 'active' solo al correcto
+                activeLink.classList.add('active');
+            }
         } catch (e) { console.warn("Error al seleccionar enlace activo:", e.message); }
     }
 }
@@ -74,6 +87,7 @@ function updateNavBasedOnAuth() {
     }
 }
 
+// Ejecutar al cargar
 setActiveNav();
 updateNavBasedOnAuth();
 
@@ -98,10 +112,10 @@ if (document.getElementById('loginForm')) {
 
     // B. Envío del formulario de login
     if (loginForm && emailInput && passwordInput) {
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('authToken'); // Limpiar al cargar login
 
         loginForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
+            e.preventDefault(); // Prevenir el envío HTML
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
 
