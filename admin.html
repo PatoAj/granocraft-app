@@ -196,67 +196,45 @@
             <div id="locationSection" class="admin-section content-area">
                 <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Mi Ubicación en el Mapa</h2>
                 <form id="locationForm" class="max-w-4xl mx-auto">
-                    <div id="locationMap"></div>
-                    <div class="flex justify-end mt-6">
-                         <button type="submit" class="form-button form-button-primary px-6">Guardar Ubicación</button>
-                    </div>
-                </form>
-            </div>
-
-            <div id="manageLocationsAdminSection" class="admin-section content-area">
-                <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Gestionar Todas las Ubicaciones (Admin)</h2>
-                
-                <form id="adminLocationForm" class="mb-8 p-6 border rounded-lg bg-gray-50 max-w-4xl mx-auto">
-                    <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Añadir Nueva Ubicación (Pública)</h3>
+                    
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
-                            <label for="adminLocationName" class="form-label">Nombre Finca/Café:</label>
-                            <input type="text" id="adminLocationName" name="locationName" required class="form-input">
+                            <label for="locationName" class="form-label">Nombre Finca/Café:</label>
+                            <input type="text" id="locationName" name="locationName" required class="form-input">
                         </div>
                         <div>
-                            <label for="adminAddress" class="form-label">Dirección:</label>
-                            <input type="text" id="adminAddress" name="address" required class="form-input">
+                            <label for="address" class="form-label">Dirección:</label>
+                            <input type="text" id="address" name="address" required class="form-input">
                         </div>
                     </div>
+
                     <label class="form-label">Ubicación en el Mapa:</label>
-                    <div id="adminLocationMap"></div> <p class="text-xs text-gray-500 mt-1 mb-4">Haz clic en el mapa para colocar el marcador.</p>
-                    <input type="hidden" id="adminLocationLatitude" name="latitude">
-                    <input type="hidden" id="adminLocationLongitude" name="longitude">
+                    <div id="locationMap"></div> 
+                    <p class="text-xs text-gray-500 mt-1 mb-4">Haz clic en el mapa para seleccionar tu ubicación exacta.</p>
+
+                    <input type="hidden" id="locationLatitude" name="latitude">
+                    <input type="hidden" id="locationLongitude" name="longitude">
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label for="adminSchedule" class="form-label">Horario:</label>
-                            <input type="text" id="adminSchedule" name="schedule" class="form-input" placeholder="Ej: L-S: 8am - 6pm">
+                            <label for="schedule" class="form-label">Horario:</label>
+                            <input type="text" id="schedule" name="schedule" class="form-input" placeholder="Ej: L-S: 8am - 6pm">
                         </div>
                         <div>
-                            <label for="adminSpecialty" class="form-label">Especialidad:</label>
-                            <input type="text" id="adminSpecialty" name="specialty" class="form-input" placeholder="Ej: V60, Chemex">
+                            <label for="specialty" class="form-label">Especialidad:</label>
+                            <input type="text" id="specialty" name="specialty" class="form-input" placeholder="Ej: V60, Chemex">
                         </div>
                     </div>
+                    
                     <div class="mt-4">
-                        <label for="adminLocationImageFile" class="form-label">Cargar Imagen (Opcional):</label>
-                        <input type="file" id="adminLocationImageFile" name="imageFile" accept="image/*" class="w-full text-sm text-gray-500 file-input-button">
-                        <img id="adminLocationImagePreview" src="#" alt="Vista previa" class="mt-2"/>
+                        <label for="locationImageFile" class="form-label">Cargar Imagen (Opcional):</label>
+                        <input type="file" id="locationImageFile" name="imageFile" accept="image/*" class="w-full text-sm text-gray-500 file-input-button">
+                        <img id="locationImagePreview" src="#" alt="Vista previa" class="mt-2"/>
                     </div>
                     <div class="flex justify-end mt-6">
-                        <button type="submit" class="form-button form-button-primary px-6">Guardar Ubicación (Admin)</button>
+                        <button type="submit" class="form-button form-button-primary px-6">Guardar Ubicación</button>
                     </div>
                 </form>
-
-                <h3 class="text-xl font-medium mb-4 text-[#3C2A21]">Ubicaciones Registradas</h3>
-                <div class="overflow-x-auto">
-                     <table class="w-full text-sm text-left text-gray-500">
-                         <thead class="text-xs text-[#3C2A21] uppercase bg-gray-100">
-                             <tr>
-                                 <th class="px-6 py-3">Nombre</th>
-                                 <th class="px-6 py-3">Dirección</th>
-                                 <th class="px-6 py-3">Dueño (Productor)</th>
-                                 <th class="px-6 py-3">Acciones</th>
-                             </tr>
-                         </thead>
-                         <tbody id="locations-admin-tbody">
-                             </tbody>
-                     </table>
-                 </div>
             </div>
             <div id="manageBlogSection" class="admin-section content-area">
                  <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Gestionar Blog</h2>
