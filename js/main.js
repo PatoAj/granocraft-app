@@ -19,7 +19,10 @@ function showToast(message, type = 'success') {
 
     // 3. Eliminar el elemento del DOM después de que la animación termine (3.5s)
     setTimeout(() => {
-        container.removeChild(toast);
+        // Asegurarse de que el toast todavía exista antes de intentar removerlo
+        if (toast.parentElement === container) {
+            container.removeChild(toast);
+        }
     }, 3500); // La animación dura 3s + 0.5s de salida
 }
 
