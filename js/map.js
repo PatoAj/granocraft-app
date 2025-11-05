@@ -1,4 +1,4 @@
-// js/map.js (CÓDIGO CORREGIDO para manejar rutas Cloudinary/Locales)
+// js/map.js (CÓDIGO FINAL CORREGIDO PARA RUTAS DE IMAGEN)
 
 document.addEventListener('DOMContentLoaded', () => {
     const mapElement = document.getElementById('mapaPublico');
@@ -31,8 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Función para crear el contenido del Popup (ventana emergente)
     function createPopupContent(location) {
-        // Usar la función corregida para la imagen del Popup (300x150)
-        const imageUrl = getImageUrl(location.imageUrl, 300, 150); 
+        // USO DE getImageUrl para el POPUP
+        const imageUrl = getImageUrl(location.imageUrl, 300, 150, location.locationName); 
         
         // Usamos el nombre del productor para mayor claridad
         const producerName = location.owner ? (location.owner.producerNamePublic || 'N/A') : 'N/A';
@@ -50,8 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Función para crear la tarjeta de lista (Directorio)
     function createLocationCard(location) {
-        // Usar la función corregida para la imagen de la Tarjeta (150x100)
-        const imageUrl = getImageUrl(location.imageUrl, 150, 100); 
+        // USO DE getImageUrl para la TARJETA DE DIRECTORIO
+        const imageUrl = getImageUrl(location.imageUrl, 150, 100, location.locationName); 
 
         const producerName = location.owner ? (location.owner.producerNamePublic || 'N/A') : 'N/A';
         const producerId = location.owner ? location.owner._id : '#';
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ? `<a href="profile.html?id=${producerId}" style="color: #8a5a44; text-decoration: underline;">Ver Perfil</a>`
             : '';
         
-        // Obtener el nombre del café/finca, usando el nombre del productor si no está definido
+        // Obtener el nombre del café/finca
         const displayName = location.locationName || producerName;
 
         return `
@@ -102,20 +102,16 @@ document.addEventListener('DOMContentLoaded', () => {
         locationsListContainer.innerHTML = '<p style="text-align: center;">Cargando directorio...</p>';
 
         try {
-            // Llamar a la API pública
             const response = await fetch('/api/locations');
             if (!response.ok) {
-                // Si hay un error, intentamos mostrarlo de forma útil
                 const errorText = await response.text();
                 throw new Error(`Error ${response.status}: ${errorText}`);
             }
             
             const locations = await response.json();
 
-            // Filtrar solo ubicaciones con latitud/longitud válidas para el mapa
             const validLocations = locations.filter(loc => loc.latitude && loc.longitude);
             
-            // Llenar el Directorio
             displayLocationsList(validLocations);
 
             // Crear un marcador (pin) por cada ubicación
@@ -124,7 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 marker.bindPopup(createPopupContent(location));
             });
             
-            // Si no hay ubicaciones válidas, centrar en Guatemala (vista por defecto)
             if (validLocations.length === 0) {
                 map.setView([15.7835, -90.2308], 7);
             }
@@ -132,7 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error al cargar las ubicaciones en el mapa:', error);
             locationsListContainer.innerHTML = '<p style="text-align: center; color: red;">Error al cargar las ubicaciones o servidor inactivo.</p>';
-            // Mostrar error en el mapa si es un error de red
             if (error.message.includes('Error')) {
                 map.openPopup('Error al cargar las ubicaciones. Revise la consola.', map.getCenter());
             }
