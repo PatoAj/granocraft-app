@@ -216,7 +216,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadAllLocations();
             }, 100); 
         }
-        if (sectionId === 'manageUsersSection') loadUsers(); 
+        if (sectionId === 'manageUsersSection') loadUsers();
+        
+        // CERRAR MENÚ MÓVIL AL CAMBIAR DE SECCIÓN
+        if (window.innerWidth < 768 && sidebar) {
+            sidebar.classList.add('-translate-x-full');
+            document.getElementById('mobile-menu-overlay')?.remove();
+        }
     }
 
     sidebarLinks.forEach(link => {
@@ -1043,23 +1049,11 @@ document.addEventListener('DOMContentLoaded', () => {
                      overlay.id = 'mobile-menu-overlay';
                      overlay.className = 'fixed inset-0 bg-black opacity-50 z-30 md:hidden';
                      document.body.appendChild(overlay);
-                     // El listener de click se maneja en window.onclick para más robustez
                 }
             } else if (overlay) {
                 // Ocultar menú, remover overlay
                 overlay.remove();
             }
-        });
-
-        // Asegurar que el menú se oculte al hacer clic en un enlace (solo en móvil)
-        sidebarLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                // Usamos el breakpoint md: de Tailwind (768px por defecto)
-                if (window.innerWidth < 768) { 
-                    sidebar.classList.add('-translate-x-full');
-                    document.getElementById('mobile-menu-overlay')?.remove();
-                }
-            });
         });
     }
 
