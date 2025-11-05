@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="css/style.css">
     
     <style>
+        /* Estilos CSS Base (No modificados, excepto para la barra lateral) */
         .content-area { background-color: #ffffff; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 1.5rem; }
         .sidebar-link { display: block; padding: 0.75rem 1rem; margin-bottom: 0.5rem; border-radius: 0.375rem; color: #3C2A21; transition: background-color 0.2s ease; cursor: pointer; }
         .sidebar-link:hover { background-color: #f3f4f6; }
@@ -46,15 +47,23 @@
     <div id="toast-container" class="toast-container"></div>
 
     <header class="bg-[#3C2A21] text-white p-4 flex justify-between items-center shadow-md">
-        <a href="index.html" class="logo font-bold text-lg text-white no-underline">☕ GranoCraft - Panel</a>
-        <nav>
-            <a href="index.html" class="hover:underline mx-2"><i class="fa-solid fa-house fa-fw mr-1"></i>Inicio</a>
+        <div class="flex items-center">
+            <button id="menuToggleButton" class="md:hidden text-white text-xl p-2 rounded mr-2 hover:bg-[#2D1F17] focus:outline-none">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <a href="index.html" class="logo font-bold text-lg text-white no-underline">☕ GranoCraft - Panel</a>
+        </div>
+        
+        <nav class="flex items-center">
+            <a href="index.html" class="hover:underline mx-2 hidden sm:inline"><i class="fa-solid fa-house fa-fw mr-1"></i>Inicio</a>
             <button id="logoutButton" class="bg-transparent border-none text-white cursor-pointer text-base ml-2 hover:underline"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
         </nav>
     </header>
 
-    <div class="flex flex-grow">
-        <aside class="w-64 bg-white p-4 shadow-lg min-h-full flex flex-col">
+    <div class="flex flex-col md:flex-row flex-grow relative">
+        
+        <aside id="sidebar" class="w-4/5 md:w-64 bg-white p-4 shadow-lg min-h-full flex flex-col fixed inset-y-0 left-0 z-40 
+                                     transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300">
             <h2 class="text-xl font-semibold mb-4 text-[#3C2A21]">Menú</h2>
             <nav id="admin-sidebar-nav" class="flex-grow">
                 <a href="#" class="sidebar-link active" data-section="profileSection" id="profileLink"><i class="fa-solid fa-user-gear fa-fw mr-2"></i>Mi Perfil</a>
@@ -69,7 +78,7 @@
             </div>
         </aside>
 
-        <main class="flex-1 p-6 overflow-y-auto">
+        <main class="flex-1 p-6 overflow-y-auto" id="main-content">
             
             <div id="profileSection" class="admin-section active content-area">
                 <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Mi Perfil y Contacto Público</h2>
@@ -237,6 +246,7 @@
                     </div>
                 </form>
             </div>
+            
             <div id="manageLocationsAdminSection" class="admin-section content-area">
                 <h2 class="text-2xl font-semibold mb-4 text-[#3C2A21]">Gestionar Todas las Ubicaciones (Admin)</h2>
                 
@@ -417,5 +427,47 @@
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="js/admin.js"></script>
+    <script>
+        // LÓGICA RESPONSIVE MÓVIL (Debe estar en admin.js, pero la ponemos aquí para la prueba rápida)
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuToggleButton = document.getElementById('menuToggleButton');
+            const sidebar = document.getElementById('sidebar');
+            
+            if (menuToggleButton && sidebar) {
+                menuToggleButton.addEventListener('click', () => {
+                    sidebar.classList.toggle('-translate-x-full');
+                    
+                    // Manejar el overlay (superposición que bloquea el fondo)
+                    let overlay = document.getElementById('mobile-menu-overlay');
+                    if (!sidebar.classList.contains('-translate-x-full')) {
+                        // Mostrar menú, crear overlay
+                        if (!overlay) {
+                             overlay = document.createElement('div');
+                             overlay.id = 'mobile-menu-overlay';
+                             overlay.className = 'fixed inset-0 bg-black opacity-50 z-30 md:hidden';
+                             document.body.appendChild(overlay);
+                             overlay.addEventListener('click', () => {
+                                 sidebar.classList.add('-translate-x-full');
+                                 overlay.remove();
+                             });
+                        }
+                    } else if (overlay) {
+                        // Ocultar menú, remover overlay
+                        overlay.remove();
+                    }
+                });
+
+                // Cierre automático si se hace clic en un enlace del menú
+                document.querySelectorAll('.sidebar-link').forEach(link => {
+                    link.addEventListener('click', () => {
+                        if (window.innerWidth < 768) {
+                            sidebar.classList.add('-translate-x-full');
+                            document.getElementById('mobile-menu-overlay')?.remove();
+                        }
+                    });
+                });
+            }
+        });
+    </script>
 </body>
 </html>

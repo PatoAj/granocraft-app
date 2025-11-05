@@ -1,4 +1,4 @@
-// GranoCraft/js/admin.js (IMPLEMENTACIÓN FINAL Y COMPLETA)
+// GranoCraft/js/admin.js (IMPLEMENTACIÓN FINAL Y COMPLETA CON RESPONSIVE FIX)
 
 /**
  * ========================================
@@ -34,6 +34,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const adminSections = document.querySelectorAll('.admin-section');
     const logoutButton = document.getElementById('logoutButton');
 
+    // RESPONSIVE FIX: Elementos para manejar el menú móvil
+    const menuToggleButton = document.getElementById('menuToggleButton');
+    const sidebar = document.getElementById('sidebar');
+    // FIN RESPONSIVE FIX
+    
     // Productos
     const productsTbody = document.getElementById('products-tbody');
     const addProductFormContainer = document.getElementById('addProductFormContainer');
@@ -224,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (logoutButton) { 
         logoutButton.addEventListener('click', () => {
             localStorage.removeItem('authToken'); 
-            showToast('Sesión cerrada.', 'success');             
+            showToast('Sesión cerrada.', 'success');             
             setTimeout(() => { window.location.href = 'login.html'; }, 500); 
         });
     }
@@ -368,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 galleryItem.className = 'relative group gallery-item';
                 galleryItem.innerHTML = `
                     <img src="${imgDisplayUrl}" alt="Imagen de galería" 
-                         class="w-full h-32 object-cover rounded-lg shadow-sm">
+                          class="w-full h-32 object-cover rounded-lg shadow-sm">
                     <button type="button" data-image-url="${imageUrl}" 
                             class="delete-gallery-image-btn"
                             style="font-size: 10px; width: 24px; height: 24px;">
@@ -629,49 +634,50 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 const location = await response.json();
                 if (location && location.locationName) {
-                    // Rellena los campos de texto
-                    document.getElementById('locationName').value = location.locationName || '';
-                    document.getElementById('address').value = location.address || '';
-                    document.getElementById('schedule').value = location.schedule || '';
-                    document.getElementById('specialty').value = location.specialty || '';
-                    
-                    // Rellena los campos ocultos de coordenadas
-                    if(locationLatitudeInput) locationLatitudeInput.value = location.latitude || '';
-                    if(locationLongitudeInput) locationLongitudeInput.value = location.longitude || '';
-                    
-                    const imageUrl = location.imageUrl ? (location.imageUrl.startsWith('http') ? location.imageUrl : `/${location.imageUrl}`) : '#';
-                    if (locationImagePreview) {
-                        locationImagePreview.src = imageUrl;
-                        locationImagePreview.style.display = location.imageUrl ? 'block' : 'none';
-                    }
-                    if (locationMap && location.latitude && location.longitude) {
-                        const latLng = [location.latitude, location.longitude];
-                        if (locationMarker) { locationMarker.setLatLng(latLng); }
-                        else {
-                            locationMarker = L.marker(latLng, { draggable: true }).addTo(locationMap).bindPopup("Tu ubicación. Puedes arrastrarme.").openPopup();
-                            locationMarker.on('dragend', function(event){
-                                var marker = event.target; var position = marker.getLatLng();
-                                if(locationLatitudeInput) locationLatitudeInput.value = position.lat.toFixed(6);
-                                if(locationLongitudeInput) locationLongitudeInput.value = position.lng.toFixed(6);
-                                locationMap.panTo(position);
-                            });
-                        }
-                        locationMap.setView(latLng, 13);
-                    } else if (locationMap) {
-                        locationForm.reset();
-                        locationImagePreview.style.display = 'none';
-                        locationMap.setView([15.7835, -90.2308], 7);
-                        if(locationMarker) { locationMap.removeLayer(locationMarker); locationMarker = null; }
-                    }
+                     // Rellena los campos de texto
+                     document.getElementById('locationName').value = location.locationName || '';
+                     document.getElementById('address').value = location.address || '';
+                     document.getElementById('schedule').value = location.schedule || '';
+                     document.getElementById('specialty').value = location.specialty || '';
+                     
+                     // Rellena los campos ocultos de coordenadas
+                     if(locationLatitudeInput) locationLatitudeInput.value = location.latitude || '';
+                     if(locationLongitudeInput) locationLongitudeInput.value = location.longitude || '';
+                     
+                     const imageUrl = location.imageUrl ? (location.imageUrl.startsWith('http') ? location.imageUrl : `/${location.imageUrl}`) : '#';
+                     if (locationImagePreview) {
+                         locationImagePreview.src = imageUrl;
+                         locationImagePreview.style.display = location.imageUrl ? 'block' : 'none';
+                     }
+                     if (locationMap && location.latitude && location.longitude) {
+                         const latLng = [location.latitude, location.longitude];
+                         if (locationMarker) { locationMarker.setLatLng(latLng); }
+                         else {
+                             locationMarker = L.marker(latLng, { draggable: true }).addTo(locationMap).bindPopup("Tu ubicación. Puedes arrastrarme.").openPopup();
+                              locationMarker.on('dragend', function(event){
+                                 var marker = event.target; var position = marker.getLatLng();
+                                 if(locationLatitudeInput) locationLatitudeInput.value = position.lat.toFixed(6);
+                                 if(locationLongitudeInput) locationLongitudeInput.value = position.lng.toFixed(6);
+                                 locationMap.panTo(position);
+                               });
+                         }
+                         locationMap.setView(latLng, 13);
+                     } else if (locationMap) {
+                          locationForm.reset();
+                          locationImagePreview.style.display = 'none';
+                          locationMap.setView([15.7835, -90.2308], 7);
+                          if(locationMarker) { locationMap.removeLayer(locationMarker); locationMarker = null; }
+                     }
                 } else if (locationMap) {
-                    locationForm.reset();
-                    locationImagePreview.style.display = 'none';
-                    locationMap.setView([15.7835, -90.2308], 7);
-                    if(locationMarker) { locationMap.removeLayer(locationMarker); locationMarker = null; }
+                     locationForm.reset();
+                     locationImagePreview.style.display = 'none';
+                     locationMap.setView([15.7835, -90.2308], 7);
+                     if(locationMarker) { locationMap.removeLayer(locationMarker); locationMarker = null; }
                 }
             }
         } catch (error) { showToast('Error al cargar tu ubicación.', 'error'); }
-    }    
+    } 
+    
     if (locationForm) {
         locationForm.addEventListener('submit', async (e) => {
              e.preventDefault();
@@ -712,7 +718,6 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (adminLocationMap) {
         // CORRECCIÓN/MEJORA: Redibujar el mapa si ya existe (el contenedor ha cambiado de display: none a block)
         adminLocationMap.invalidateSize(); 
-        // Nota: El setTimeout ya está en switchSection, aquí solo lo ejecutamos directamente.
     }
     }
 
@@ -861,7 +866,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  submitBtn.disabled = false;
                  showToast('Error de red al publicar post.', 'error'); 
              }
-         });
+        });
     }
 
     async function deletePost(e) {
@@ -1013,10 +1018,54 @@ document.addEventListener('DOMContentLoaded', () => {
     window.onclick = (event) => { 
         if (event.target == editProductModal) closeEditProductModal(); 
         if (event.target == editPostModal) closeEditPostModal(); 
+        
+        // LÓGICA RESPONSIVE: Cierra el menú lateral si se hace clic en el overlay
+        const sidebarOverlay = document.getElementById('mobile-menu-overlay');
+        if (event.target === sidebarOverlay && sidebar) {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.remove();
+        }
     };
 
     // =========================================================================
-    // 5. INICIALIZACIÓN FINAL
+    // 6. LÓGICA RESPONSIVE (Menú Lateral Móvil)
+    // =========================================================================
+    if (menuToggleButton && sidebar) {
+        menuToggleButton.addEventListener('click', () => {
+            sidebar.classList.toggle('-translate-x-full');
+            
+            // Manejar el overlay (superposición que bloquea el fondo)
+            let overlay = document.getElementById('mobile-menu-overlay');
+            if (!sidebar.classList.contains('-translate-x-full')) {
+                // Mostrar menú, crear overlay
+                if (!overlay) {
+                     overlay = document.createElement('div');
+                     overlay.id = 'mobile-menu-overlay';
+                     overlay.className = 'fixed inset-0 bg-black opacity-50 z-30 md:hidden';
+                     document.body.appendChild(overlay);
+                     // El listener de click se maneja en window.onclick para más robustez
+                }
+            } else if (overlay) {
+                // Ocultar menú, remover overlay
+                overlay.remove();
+            }
+        });
+
+        // Asegurar que el menú se oculte al hacer clic en un enlace (solo en móvil)
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                // Usamos el breakpoint md: de Tailwind (768px por defecto)
+                if (window.innerWidth < 768) { 
+                    sidebar.classList.add('-translate-x-full');
+                    document.getElementById('mobile-menu-overlay')?.remove();
+                }
+            });
+        });
+    }
+
+
+    // =========================================================================
+    // 7. INICIALIZACIÓN FINAL
     // =========================================================================
     const initialSection = 'profileSection'; // Todos inician en "Mi Perfil"
     switchSection(initialSection); 
