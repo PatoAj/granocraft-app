@@ -1,4 +1,4 @@
-// GranoCraft/js/producer_profile.js
+// GranoCraft/js/producer_profile.js (CÓDIGO CORREGIDO PARA CLOUDINARY Y MANEJO DE ERRORES)
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- 1. OBTENER REFERENCIAS Y EL ID DEL PRODUCTOR ---
@@ -14,12 +14,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const producerLogoElement = document.getElementById('producer-logo');
     const profileGalleryContainer = document.getElementById('profile-gallery-container');
     const galleryGrid = document.getElementById('gallery-grid');
+    // Referencia a la tarjeta principal para inyectar errores
+    const mainCardElement = document.getElementById('producer-main-card'); 
+
 
     if (!producerId) {
         producerNameElement.textContent = "Error: Productor no especificado.";
         producerBioElement.textContent = "Asegúrese de usar un enlace de perfil válido.";
         return;
     }
+    
+    // =========================================================================
+    // UTILIDAD: Función para manejar rutas de imágenes (Cloudinary o Local)
+    // =========================================================================
+    function getImageUrl(path) {
+        if (!path) return null;
+        if (path.startsWith('http')) {
+            // Cloudinary o URL absoluta
+            return path;
+        }
+        // Ruta local
+        return `/${path}`;
+    }
+
 
     // --- 2. FUNCIÓN PARA CONSTRUIR LOS BOTONES DE CONTACTO ---
     function buildContactLinks(contact, email) {
@@ -55,18 +72,21 @@ document.addEventListener('DOMContentLoaded', () => {
         contactLinksContainer.innerHTML = html;
     }
     
-    // --- 3. FUNCIÓN PARA CONSTRUIR LA GALERÍA (AHORA CON SIMPLELIGHTBOX) ---
+    // --- 3. FUNCIÓN PARA CONSTRUIR LA GALERÍA ---
     function buildGallery(images) {
         if (!images || images.length === 0) {
-            profileGalleryContainer.style.display = 'none';
+            if (profileGalleryContainer) profileGalleryContainer.style.display = 'none';
             return;
         }
 
         galleryGrid.innerHTML = '';
-        images.forEach(imageUrl => {
-            const imgPath = `/${imageUrl}`;
+        images.forEach(imagePath => {
+            // USAR getImageUrl para asegurar la ruta correcta (Cloudinary/Local)
+            const imgPath = getImageUrl(imagePath);
+            if (!imgPath) return; 
+
             const galleryItemLink = document.createElement('a');
-            galleryItemLink.href = imgPath;
+            galleryItemLink.href = imgPath; // Ruta completa o Cloudinary URL
             galleryItemLink.className = 'gallery-item';
             
             const img = document.createElement('img');
@@ -77,49 +97,71 @@ document.addEventListener('DOMContentLoaded', () => {
             galleryGrid.appendChild(galleryItemLink);
         });
 
-        profileGalleryContainer.style.display = 'block';
+        if (profileGalleryContainer) profileGalleryContainer.style.display = 'block';
 
         // Inicializar SimpleLightbox después de que las imágenes se han cargado
-        new SimpleLightbox('.gallery-grid a', {
-            captions: true,
-            captionDelay: 10,
-            animationSpeed: 150,
-            preloading: true,
-            quitOnEsc: true,
-            loop: true,
-        });
+        // Nota: Asegúrate de que la librería SimpleLightbox esté cargada en profile.html
+        if (typeof SimpleLightbox !== 'undefined') {
+            new SimpleLightbox('.gallery-grid a', {
+                captions: true,
+                captionDelay: 10,
+                animationSpeed: 150,
+                preloading: true,
+                quitOnEsc: true,
+                loop: true,
+            });
+        }
     }
 
     // --- 4. FUNCIÓN PRINCIPAL PARA OBTENER LOS DATOS ---
     async function fetchProducerData() {
         try {
             const response = await fetch(`/api/public/profile/${producerId}`); 
+            
+            if (response.status === 404) {
+                 // Perfil no encontrado (respuesta OK, pero recurso no existe)
+                 producerNameElement.textContent = "Perfil no encontrado (404).";
+                 producerBioElement.textContent = "El ID de productor no es válido.";
+                 return;
+            }
+            
             if (!response.ok) {
-                producerNameElement.textContent = "Perfil no encontrado.";
-                return;
+                // Error de servidor (5xx) o de API (4xx genérico)
+                throw new Error(`Error de red al cargar perfil: ${response.status}`);
             }
             
             const producer = await response.json();
             
             const name = producer.producerNamePublic || 'Productor GranoCraft';
-            profileTitle.textContent = `${name} | Perfil`;
+            if (profileTitle) profileTitle.textContent = `${name} | Perfil`;
             producerNameElement.textContent = name;
             producerBioElement.textContent = producer.bio || 'Este productor aún no ha escrito su biografía.';
 
-            if (producer.profileImage) {
-                producerLogoElement.src = `/${producer.profileImage}`;
-                producerLogoElement.style.display = 'block';
-            } else {
-                producerLogoElement.style.display = 'none';
-                producerNameElement.style.paddingTop = '0px';
+            // MANEJO DE LOGO CORREGIDO
+            const logoPath = getImageUrl(producer.profileImage);
+
+            if (producerLogoElement) {
+                 if (logoPath) {
+                     producerLogoElement.src = logoPath;
+                     producerLogoElement.style.display = 'block';
+                 } else {
+                     producerLogoElement.src = '/img/logo_default.png'; // Fallback visual
+                     // Si la imagen es nula, mostramos el nombre más centrado
+                     producerLogoElement.style.display = 'none'; 
+                     producerNameElement.style.paddingTop = '0px'; 
+                 }
             }
+
 
             buildContactLinks(producer.contact, producer.email);
             buildGallery(producer.galleryImages);
 
         } catch (error) {
             console.error("Fallo al obtener el perfil del productor:", error);
-            producerNameElement.textContent = "Error de conexión con el servidor.";
+            
+            // Si el error es de red/servidor (el que causó la imagen "Error de conexión")
+            if (producerNameElement) producerNameElement.textContent = "Error de conexión con el servidor.";
+            if (producerBioElement) producerBioElement.textContent = "No se pudo establecer conexión con la base de datos o API.";
         }
     }
 

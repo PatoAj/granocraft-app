@@ -1,4 +1,4 @@
-// js/map.js (CÓDIGO CORREGIDO PARA SOPORTAR CLOUDINARY O RUTAS LOCALES)
+// js/map.js (CÓDIGO CORREGIDO para manejar rutas Cloudinary/Locales)
 
 document.addEventListener('DOMContentLoaded', () => {
     const mapElement = document.getElementById('mapaPublico');
@@ -6,13 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (!mapElement) { return; }
 
-    // 1. FUNCIÓN CORREGIDA PARA MANEJAR RUTAS CLOUDINARY O LOCALES
+    // 1. FUNCIÓN PARA MANEJAR RUTAS CLOUDINARY O LOCALES
     /**
      * Determina la URL correcta de la imagen (Cloudinary, local o placeholder).
-     * @param {string} path - La ruta o URL devuelta por el servidor (location.imageUrl).
-     * @param {number} width - Ancho del placeholder.
-     * @param {number} height - Alto del placeholder.
-     * @param {string} placeholderText - Texto para el placeholder.
      */
     function getImageUrl(path, width, height, placeholderText = 'Sin Imagen') {
         if (!path) {
@@ -35,11 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Función para crear el contenido del Popup (ventana emergente)
     function createPopupContent(location) {
-        // Usar la función corregida para la imagen del Popup (e.g., 300x150)
+        // Usar la función corregida para la imagen del Popup (300x150)
         const imageUrl = getImageUrl(location.imageUrl, 300, 150); 
         
         // Usamos el nombre del productor para mayor claridad
-        const producerName = location.owner ? location.owner.producerNamePublic : 'N/A';
+        const producerName = location.owner ? (location.owner.producerNamePublic || 'N/A') : 'N/A';
 
         return `
             <div style="font-family: Arial, sans-serif; max-width: 250px;">
@@ -54,22 +50,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Función para crear la tarjeta de lista (Directorio)
     function createLocationCard(location) {
-        // Usar la función corregida para la imagen de la Tarjeta (e.g., 150x100)
+        // Usar la función corregida para la imagen de la Tarjeta (150x100)
         const imageUrl = getImageUrl(location.imageUrl, 150, 100); 
 
-        const producerName = location.owner ? location.owner.producerNamePublic : 'N/A';
+        const producerName = location.owner ? (location.owner.producerNamePublic || 'N/A') : 'N/A';
         const producerId = location.owner ? location.owner._id : '#';
 
         // Enlace al perfil del productor
         const profileLink = producerId !== '#' 
             ? `<a href="profile.html?id=${producerId}" style="color: #8a5a44; text-decoration: underline;">Ver Perfil</a>`
             : '';
+        
+        // Obtener el nombre del café/finca, usando el nombre del productor si no está definido
+        const displayName = location.locationName || producerName;
 
         return `
             <div class="location-card">
-                <img src="${imageUrl}" alt="${location.locationName}">
+                <img src="${imageUrl}" alt="${displayName}">
                 <div class="location-card-content">
-                    <h3>${location.locationName}</h3>
+                    <h3>${displayName}</h3>
                     <p><strong>Productor:</strong> ${producerName} ${profileLink}</p>
                     <p>📍 ${location.address}</p>
                     <p>⏰ ${location.schedule || 'Consultar horarios'}</p>
@@ -106,7 +105,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Llamar a la API pública
             const response = await fetch('/api/locations');
             if (!response.ok) {
-                throw new Error(`Error al cargar ubicaciones: ${response.status}`);
+                // Si hay un error, intentamos mostrarlo de forma útil
+                const errorText = await response.text();
+                throw new Error(`Error ${response.status}: ${errorText}`);
             }
             
             const locations = await response.json();
@@ -122,11 +123,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const marker = L.marker([location.latitude, location.longitude]).addTo(map);
                 marker.bindPopup(createPopupContent(location));
             });
+            
+            // Si no hay ubicaciones válidas, centrar en Guatemala (vista por defecto)
+            if (validLocations.length === 0) {
+                map.setView([15.7835, -90.2308], 7);
+            }
 
         } catch (error) {
             console.error('Error al cargar las ubicaciones en el mapa:', error);
-            locationsListContainer.innerHTML = '<p style="text-align: center; color: red;">No se pudieron cargar las ubicaciones en el mapa.</p>';
-            map.openPopup('Error al cargar las ubicaciones.', map.getCenter());
+            locationsListContainer.innerHTML = '<p style="text-align: center; color: red;">Error al cargar las ubicaciones o servidor inactivo.</p>';
+            // Mostrar error en el mapa si es un error de red
+            if (error.message.includes('Error')) {
+                map.openPopup('Error al cargar las ubicaciones. Revise la consola.', map.getCenter());
+            }
         }
     }
 
